@@ -46,7 +46,7 @@ Read the [ZygiskNextModuleSample](https://github.com/5ec1cff/ZygiskNextModuleSam
 
 ### HyperOS Runtime
 
-Look this: [hyos_runtime.md](https://github.com/Dr-TSNG/ZygiskNext/blob/main/docs/hyos_runtime.md)
+Look this: [hyos_runtime.md](https://github.com/LSPosed/ZygiskNext/blob/main/docs/hyos_runtime.md)
 
 ## Community Discussion
 
@@ -61,8 +61,8 @@ Create a Pull Request.
 ## Credits 
 
 - [Magisk](https://github.com/topjohnwu/Magisk/): makes all these possible
-- [ZygiskNext](https://github.com/Dr-TSNG/ZygiskNext): OG implementation
-- [Dobby](https://github.com/jmpews/Dobby), [rv64hook](https://github.com/eirv/riscv64-inline-hook) and [ShadowHook](https://github.com/bytedance/android-inline-hook): used for inline hooking
+- [ZygiskNext](https://github.com/LSPosed/ZygiskNext): OG implementation
+- [Dobby](https://github.com/LSPosed/Dobby), [rv64hook](https://github.com/eirv/riscv64-inline-hook) and [ShadowHook](https://github.com/bytedance/android-inline-hook): used for inline hooking
 - [LSPlt](https://github.com/LSPosed/LSPlt), [ByteHook](https://github.com/bytedance/bhook), [xHook](https://github.com/iqiyi/xHook) and [PLTI](https://github.com/PerformanC/PLTI): uesd for plt hooking
 - [libcxx](https://github.com/LSPosed/prefab-libcxx): libc++/libc++abi statically linked into the loader
 - [LZMA SDK](https://www.7-zip.org/sdk.html) and [xz-embedded](https://github.com/tukaani-project/xz-embedded): `.gnu_debugdata` decompressor
