@@ -29,6 +29,7 @@ mod kernel;
 mod kernel_bpf;
 mod kernel_connector;
 mod log;
+mod machikado;
 mod maps;
 mod mode;
 mod paths;
@@ -49,6 +50,11 @@ fn main() {
     }
 
     let module_dir = ctl::module_dir(&matches).unwrap_or_else(ctl::module_dir_of_self);
+
+    if let Err(error) = machikado::verify_module() {
+        crate::log::loge!("module verification failed: {error}");
+        std::process::exit(1);
+    }
 
     daemon::Daemon::new(module_dir).run();
 }

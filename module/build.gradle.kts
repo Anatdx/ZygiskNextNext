@@ -1,8 +1,20 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("xyz.baaad.machikado:java:3.0.1")
+    }
+}
+
 import android.databinding.tool.ext.capitalizeUS
+import java.nio.file.Files
 import java.security.MessageDigest
 import org.apache.commons.codec.binary.Hex
 import org.apache.tools.ant.filters.FixCrLfFilter
 import org.apache.tools.ant.filters.ReplaceTokens
+import xyz.baaad.machikado.Sign
+import xyz.baaad.machikado.Utils
 
 plugins {
     alias(libs.plugins.agp.lib)
@@ -158,7 +170,49 @@ androidComponents.onVariants { variant ->
             }
         }
 
+        val root = moduleDir.get()
+
         doLast {
+            if (file("private_key").exists()) {
+                println("=== Guards the peace of Machikado ===")
+                val privateKey = file("private_key").readBytes()
+                fun getSign(name: String, abi: String, abi32: String, abi64: String) {
+                    val mapping = Utils.FileMapping()
+                    mapping.insert("module.prop.orig", "module.prop")
+                    mapping.insert("post-fs-data.sh", null)
+                    mapping.insert("emulated-soft-reboot.sh", null)
+                    mapping.insert("sepolicy.rule", null)
+                    mapping.insert("mazoku", null)
+                    mapping.insert("bin/injector", "bin/$abi/injector")
+                    mapping.insert("lib/libloader.so", "lib/$abi32/libloader.so")
+                    mapping.insert("lib64/libloader.so", "lib/$abi64/libloader.so")
+                    root.asFile.resolve("webroot").walkTopDown()
+                        .filter { it.isFile }
+                        .forEach { webrootFile ->
+                            val relative = webrootFile.relativeTo(root.asFile).invariantSeparatorsPath
+                            mapping.insert(relative, relative)
+                        }
+                    val entries: MutableList<Sign.FileEntry> = Utils.loadFromMapping(
+                        root.asFile.toPath(),
+                        mapping
+                    )
+                    val machikado = Sign.signFileEntries(entries, privateKey)
+                    Files.write(root.file(name).asFile.toPath(), machikado.asBytes())
+                }
+                getSign("machikado.arm64", "arm64-v8a", "armeabi-v7a", "arm64-v8a")
+                getSign("machikado.x64", "x86_64", "x86", "x86_64")
+                getSign("machikado.arm", "armeabi-v7a", "armeabi-v7a", "arm64-v8a")
+                getSign("machikado.x86", "x86", "x86", "x86_64")
+                getSign("machikado.riscv64", "riscv64", "riscv64", "riscv64")
+            } else {
+                println("no private_key found, this build will not be signed")
+                root.file("machikado.arm64").asFile.createNewFile()
+                root.file("machikado.x64").asFile.createNewFile()
+                root.file("machikado.arm").asFile.createNewFile()
+                root.file("machikado.x86").asFile.createNewFile()
+                root.file("machikado.riscv64").asFile.createNewFile()
+            }
+
             fileTree(moduleDir).visit {
                 if (isDirectory) return@visit
                 val md = MessageDigest.getInstance("SHA-256")

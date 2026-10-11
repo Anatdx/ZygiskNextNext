@@ -17,7 +17,10 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
+use const_format::concatcp;
+
 pub const STATE_DIR: &str = "/data/adb/zygisknextsu";
 pub const STATE_FILE: &str = "/data/adb/zygisknextsu/znn_state.json";
 pub const CONFIG_FILE: &str = "/data/adb/zygisknextsu/config";
 pub const MODULES_DIR: &str = "/data/adb/modules";
+pub const ZYGISK_NEXT_NEXT: &str = concatcp!(MODULES_DIR, "/zygisknextsu");

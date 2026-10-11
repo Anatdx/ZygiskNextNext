@@ -93,10 +93,13 @@ fi
 
 ui_print "- Extracting module files"
 extract "$ZIPFILE" 'module.prop'               "$MODPATH"
-cp "$MODPATH/module.prop" "$MODPATH/module.prop.orig"
+cp      "$MODPATH/module.prop"                 "$MODPATH/module.prop.orig"
 extract "$ZIPFILE" 'post-fs-data.sh'           "$MODPATH"
-mv "$TMPDIR/sepolicy.rule" "$MODPATH"
+mv      "$TMPDIR/sepolicy.rule"                "$MODPATH"
 extract "$ZIPFILE" 'emulated-soft-reboot.sh'   "$MODPATH"
+extract "$ZIPFILE" "machikado.$ARCH"           "$MODPATH"
+mv      "$MODPATH/machikado.$ARCH"             "$MODPATH/machikado"
+extract "$ZIPFILE" 'mazoku'                    "$MODPATH"
 
 mkdir "$MODPATH/bin"
 mkdir "$MODPATH/lib"
