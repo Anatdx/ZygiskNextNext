@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/KernelSU-Modules/tools/main/schemas/module.schema.json
+
+schemaVersion: 1
+id: zygisknextsu
+name: Zygisk Next Next
+summary: A from-scratch, standalone implementation of the Zygisk Next module
+description: README.md
+license: GPL-3.0-only
+homepage: https://baaad.xyz/
+support: https://github.com/VeryBaaad/ZygiskNextNext/issues
+tags: [system]
+metamodule: false
+
+authors:
+  - name: Author
+    url: https://github.com/VeryBaaad
+
+compatibility:
+  androidMinApi: 21
+  architectures: [arm64-v8a, armeabi-v7a, x86_64, x86, riscv64]
+
+release:
+  assetPattern: "Zygisk-Next-Next-v*-release.zip"
