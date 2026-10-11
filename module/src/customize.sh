@@ -135,3 +135,10 @@ ui_print "- Setting permissions"
 set_perm_recursive "$MODPATH/bin" 0 0 0755 0755
 set_perm_recursive "$MODPATH/lib" 0 0 0755 0644 u:object_r:system_lib_file:s0
 set_perm_recursive "$MODPATH/lib64" 0 0 0755 0644 u:object_r:system_lib_file:s0
+
+ui_print " "
+ui_print "! This module is not a Zygisk implementation, "
+ui_print "! install it separately if you needed"
+ui_print " "
+
+ui_print "Welcome to Zygisk Next Next!"
