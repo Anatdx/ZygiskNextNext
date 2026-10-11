@@ -99,8 +99,12 @@ androidComponents.onVariants { variant ->
         into(moduleDir)
         from("${rootProject.projectDir}/README.md")
         from("$projectDir/src") {
-            exclude("module.prop", "customize.sh", "post-fs-data.sh")
+            exclude("module.prop", "customize.sh", "post-fs-data.sh", "mazoku")
             filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
+        }
+        // `mazoku` is a binary signature blob and must be copied verbatim.
+        from("$projectDir/src") {
+            include("mazoku")
         }
         from(rootProject.file("module/webroot")) {
             into("webroot")
