@@ -156,9 +156,11 @@ impl Daemon {
             logw!("init (pid 1) does not stop; keeping it traced");
             return false;
         }
-        self.tracees.remove(&1);
         match ptrace::detach_result(1, None) {
-            Ok(()) => true,
+            Ok(()) => {
+                self.tracees.remove(&1);
+                true
+            }
             Err(error) => {
                 logw!("cannot detach from init: {error}");
                 ptrace::cont(1, None);
