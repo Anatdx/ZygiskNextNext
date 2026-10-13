@@ -231,7 +231,7 @@ impl Daemon {
         if !replaced {
             return false;
         }
-        fs::write(&path, out.as_bytes()).is_ok()
+        crate::fileio::replace_file(&path, out.as_bytes()).is_ok()
     }
 }
 
