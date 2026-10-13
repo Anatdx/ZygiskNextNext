@@ -8,28 +8,28 @@ updates:
   - package-ecosystem: "gradle" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "chore"
       include: "scope"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "chore"
       include: "scope"
   - package-ecosystem: "gitsubmodule"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "chore"
       include: "scope"
   - package-ecosystem: "cargo"
     directory: "/injector/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -40,7 +40,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/webui/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "chore"
       include: "scope"
