@@ -29,12 +29,17 @@ namespace znn::api {
 
 int connectCompanion(void* handle) {
     auto* h = static_cast<ModuleHandle*>(handle);
-    if (!h || h->companion_listen_fd < 0) return -1;
+    if (!h) return -1;
 
     if (h->companion_channel < 0) {
+        if (h->companion_listen_fd < 0) return -1;
         h->companion_channel =
             ipc::acceptChannel(h->companion_listen_fd, h->companion_nonce,
                                ipc::kChannelAcceptTimeoutMs);
+        if (h->companion_channel >= 0) {
+            close(h->companion_listen_fd);
+            h->companion_listen_fd = -1;
+        }
     }
     if (h->companion_channel < 0) return -1;
 
