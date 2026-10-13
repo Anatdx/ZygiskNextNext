@@ -68,10 +68,10 @@ export function useAppData(): AppData {
           return null;
         }),
       ]);
-      status.value = nextStatus;
-      system.value = nextSystem;
-      modules.value = nextModules;
-      if (generation === configGeneration) config.value = nextConfig;
+      if (nextStatus !== null) status.value = nextStatus;
+      if (nextSystem !== null) system.value = nextSystem;
+      if (nextModules !== null) modules.value = nextModules;
+      if (generation === configGeneration && nextConfig !== null) config.value = nextConfig;
     } finally {
       loading.value = false;
     }
