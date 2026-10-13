@@ -92,7 +92,7 @@ const EMPTY_CONFIG: HookConfig = {
         <ZnStatusCard
           :status="props.status"
           :root="props.system?.root ?? null"
-          :modules="modules"
+          :modules="props.modules"
           :refreshing="props.loading"
           :error="failed(!!props.status)"
         />

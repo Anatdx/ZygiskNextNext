@@ -34,7 +34,7 @@ import ZnTag from './ZnTag.vue';
 const props = defineProps<{
   status: InjectorStatus | null;
   root: RootImplementation | null;
-  modules: ZnnModule[];
+  modules: ZnnModule[] | null;
   refreshing: boolean;
   error?: boolean;
 }>();
@@ -88,7 +88,10 @@ const injectorLabel = computed(() => {
       </div>
     </div>
 
-    <ZnCollapse :title="t('zn.modules.title', { n: props.modules.length })">
+    <ZnCollapse
+      v-if="props.modules"
+      :title="t('zn.modules.title', { n: props.modules.length })"
+    >
       <ZnModuleList :modules="props.modules" />
     </ZnCollapse>
   </ZnCard>
