@@ -20,7 +20,7 @@
 use std::fs;
 use std::path::Path;
 
-use machikado_rs::{load_folder_files, verify};
+use machikado_rs::{FileEntry, verify};
 
 use crate::daemon::MODULE_ID;
 
@@ -29,14 +29,51 @@ const ORG_PUBLIC_KEY: [u8; 32] = [
     104, 121, 88, 173, 152, 219, 116, 71, 200, 239, 190,
 ];
 
+const SIGNED_FILES: [&str; 8] = [
+    "bin/injector",
+    "emulated-soft-reboot.sh",
+    "lib/libloader.so",
+    "lib64/libloader.so",
+    "mazoku",
+    "module.prop.orig",
+    "post-fs-data.sh",
+    "sepolicy.rule",
+];
+
+fn load_entry(path: &Path, relative_path: &str) -> Result<FileEntry, String> {
+    let content = fs::read(path).map_err(|error| error.to_string())?;
+    Ok(FileEntry {
+        relative_path: relative_path.to_owned(),
+        content,
+    })
+}
+
+fn load_webroot(dir: &Path, prefix: &str, entries: &mut Vec<FileEntry>) -> Result<(), String> {
+    let mut children = Vec::new();
+    for child in fs::read_dir(dir).map_err(|error| error.to_string())? {
+        children.push(child.map_err(|error| error.to_string())?);
+    }
+    children.sort_by_key(|child| child.file_name());
+
+    for child in children {
+        let file_type = child.file_type().map_err(|error| error.to_string())?;
+        let relative_path = format!("{prefix}/{}", child.file_name().to_string_lossy());
+        if file_type.is_dir() {
+            load_webroot(&child.path(), &relative_path, entries)?;
+        } else if file_type.is_file() {
+            entries.push(load_entry(&child.path(), &relative_path)?);
+        }
+    }
+    Ok(())
+}
+
 pub(crate) fn verify_module(module_dir: &Path) -> Result<(), String> {
-    let entries = load_folder_files(
-        module_dir,
-        &[],
-        &["machikado", "module.prop", "remove", "disable", "update"],
-        None,
-    )
-    .map_err(|error| error.to_string())?;
+    let mut entries = Vec::new();
+    for relative_path in SIGNED_FILES {
+        entries.push(load_entry(&module_dir.join(relative_path), relative_path)?);
+    }
+    load_webroot(&module_dir.join("webroot"), "webroot", &mut entries)?;
+    entries.sort_by(|a, b| a.relative_path.cmp(&b.relative_path));
 
     let machikado = fs::read(module_dir.join("machikado")).map_err(|error| error.to_string())?;
     let mazoku = fs::read(module_dir.join("mazoku")).map_err(|error| error.to_string())?;
