@@ -51,7 +51,7 @@ fn main() {
 
     let module_dir = ctl::module_dir(&matches).unwrap_or_else(ctl::module_dir_of_self);
 
-    if let Err(error) = machikado::verify_module() {
+    if let Err(error) = machikado::verify_module(&module_dir) {
         crate::log::loge!("module verification failed: {error}");
         std::process::exit(1);
     }

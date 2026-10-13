@@ -23,16 +23,13 @@ use std::path::Path;
 use machikado_rs::{load_folder_files, verify};
 
 use crate::daemon::MODULE_ID;
-use crate::paths;
 
 const ORG_PUBLIC_KEY: [u8; 32] = [
     123, 192, 97, 178, 44, 86, 95, 77, 138, 95, 46, 239, 113, 227, 151, 200, 0, 120, 148, 124, 95,
     104, 121, 88, 173, 152, 219, 116, 71, 200, 239, 190,
 ];
 
-pub(crate) fn verify_module() -> Result<(), String> {
-    let module_dir = Path::new(paths::ZYGISK_NEXT_NEXT);
-
+pub(crate) fn verify_module(module_dir: &Path) -> Result<(), String> {
     let entries = load_folder_files(
         module_dir,
         &[],
