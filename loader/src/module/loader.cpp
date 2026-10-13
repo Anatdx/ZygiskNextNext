@@ -26,6 +26,7 @@
 #include "utils/dlext.h"
 
 #include <dlfcn.h>
+#include <unistd.h>
 
 namespace znn::module {
 namespace {
@@ -42,8 +43,10 @@ void loadEntry(const Plan& plan, const PlanModule& entry) {
     void* lib = dlopenFd(entry.fd, entry.path.c_str(), RTLD_NOW);
     if (!lib) {
         LOGE("dlopen %s (fd %d) failed: %s", entry.path.c_str(), entry.fd, dlerror());
+        close(entry.fd);
         return;
     }
+    close(entry.fd);
 
     auto* m = reinterpret_cast<ZygiskNextModule*>(dlsym(lib, "zn_module"));
     if (!m || !m->onModuleLoaded) {
