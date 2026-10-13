@@ -197,7 +197,7 @@ fn decode_payload(payload: &[u8], events: &mut Vec<ProcEvent>) {
     let what = read_u32(body, 0);
     match what {
         PROC_EVENT_FORK if body.len() >= 32 => {
-            let parent = read_pid(body, 20);
+            let parent = read_pid(body, 16);
             let child = read_pid(body, 24);
             let child_tgid = read_pid(body, 28);
             if child == child_tgid && child_tgid > 1 {
