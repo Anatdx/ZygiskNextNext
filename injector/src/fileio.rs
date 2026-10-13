@@ -24,6 +24,11 @@ use std::path::{Path, PathBuf};
 
 pub fn replace_file(target: &Path, contents: &[u8]) -> io::Result<()> {
     let temporary = temporary_path(target);
+    match fs::remove_file(&temporary) {
+        Ok(()) => {}
+        Err(error) if error.kind() == io::ErrorKind::NotFound => {}
+        Err(error) => return Err(error),
+    }
     match write_new(&temporary, contents) {
         Ok(()) => {}
         Err(error) => {
@@ -47,9 +52,9 @@ pub fn temporary_path(target: &Path) -> PathBuf {
 fn write_new(path: &Path, contents: &[u8]) -> io::Result<()> {
     let mut file = OpenOptions::new()
         .write(true)
-        .create(true)
-        .truncate(true)
+        .create_new(true)
         .mode(0o644)
+        .custom_flags(libc::O_NOFOLLOW)
         .open(path)?;
     file.write_all(contents)?;
     file.sync_all()
