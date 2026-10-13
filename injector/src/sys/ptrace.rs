@@ -30,6 +30,7 @@ const NT_PRSTATUS: usize = 1;
 
 const PTRACE_SEIZE: libc::c_int = 0x4206;
 const PTRACE_INTERRUPT: libc::c_int = 0x4207;
+const PTRACE_LISTEN: libc::c_int = 0x4208;
 
 pub fn peek_data(pid: Pid, address: usize) -> io::Result<usize> {
     ptrace::read(NixPid::from_raw(pid), address as *mut c_void)
@@ -78,10 +79,21 @@ pub fn interrupt(pid: Pid) -> io::Result<()> {
     Ok(())
 }
 
+pub fn listen(pid: Pid) -> io::Result<()> {
+    if unsafe { libc::ptrace(PTRACE_LISTEN, pid, 0usize, 0usize) } != 0 {
+        return Err(io::Error::last_os_error());
+    }
+    Ok(())
+}
+
 pub fn event_message(pid: Pid) -> io::Result<usize> {
     ptrace::getevent(NixPid::from_raw(pid))
         .map(|message| message as usize)
         .map_err(io::Error::from)
+}
+
+pub fn getsiginfo(pid: Pid) -> io::Result<libc::siginfo_t> {
+    ptrace::getsiginfo(NixPid::from_raw(pid)).map_err(io::Error::from)
 }
 
 pub fn cont(pid: Pid, signal_number: Option<i32>) {

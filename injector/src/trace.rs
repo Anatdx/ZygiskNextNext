@@ -131,12 +131,21 @@ impl Daemon {
         }
 
         let crash_signal = status.stop_signal();
-        if crash_signal == signal::SIGTRAP {
-            let event = status.trap_event();
-            if event == ptrace::EVENT_STOP {
-                ptrace::cont(pid, None);
-                return;
+        let event = status.trap_event();
+        if event == ptrace::EVENT_STOP {
+            match ptrace::getsiginfo(pid) {
+                Ok(info) if is_group_stop(info.si_signo) => {
+                    if let Err(error) = ptrace::listen(pid) {
+                        logw!("pid {pid}: cannot park the group stop: {error}");
+                        ptrace::cont(pid, None);
+                    }
+                }
+                _ => ptrace::cont(pid, None),
             }
+            return;
+        }
+
+        if crash_signal == signal::SIGTRAP {
             match event {
                 ptrace::EVENT_FORK | ptrace::EVENT_VFORK | ptrace::EVENT_CLONE => {
                     if let Ok(child) = ptrace::event_message(pid)
@@ -162,8 +171,8 @@ impl Daemon {
             return;
         }
 
-        if crash_signal == signal::SIGSTOP {
-            ptrace::cont(pid, None);
+        if is_group_stop(crash_signal) {
+            ptrace::cont(pid, Some(crash_signal));
             return;
         }
 
@@ -773,6 +782,13 @@ fn push_bytes(pid: Pid, regs: &mut Regs, bytes: &[u8]) -> Option<usize> {
 
 fn trap_reports_next_instruction(arch: Arch) -> bool {
     matches!(arch, Arch::X86 | Arch::X86_64)
+}
+
+fn is_group_stop(signal_number: i32) -> bool {
+    matches!(
+        signal_number,
+        signal::SIGSTOP | signal::SIGTSTP | signal::SIGTTIN | signal::SIGTTOU
+    )
 }
 
 fn unskip_entry_instruction(pid: Pid, tracee: &Tracee) {
