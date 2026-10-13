@@ -73,12 +73,15 @@ bool shadowhookUnhook(void* target) {
         auto it = g_stubs.find(reinterpret_cast<uintptr_t>(target));
         if (it != g_stubs.end()) {
             stub = it->second;
-            g_stubs.erase(it);
         }
     }
     if (!stub || shadowhook_unhook(stub) != 0) {
         LOGE("inlineUnhook %p failed", target);
         return false;
+    }
+    {
+        std::lock_guard<std::mutex> lk(g_mutex);
+        g_stubs.erase(reinterpret_cast<uintptr_t>(target));
     }
     return true;
 }
