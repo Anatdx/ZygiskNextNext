@@ -151,22 +151,46 @@ fn find_symbol(bytes: &[u8], header: &ElfHeader, base: usize, symbol: &str) -> O
             usize::try_from(header.word(bytes, strings_header + 32, strings_header + 20)?).ok()?;
 
         for entry in 0..entries_size / entry_stride {
-            let symbol_entry = entries_offset.checked_add(entry.checked_mul(entry_stride)?)?;
-            let name_offset = usize::try_from(read_u32(bytes, symbol_entry)?).ok()?;
-            let section_index = read_u16(bytes, symbol_entry + if header.is_64 { 6 } else { 14 })?;
+            let Some(entry_offset) = entry.checked_mul(entry_stride) else {
+                continue;
+            };
+            let Some(symbol_entry) = entries_offset.checked_add(entry_offset) else {
+                continue;
+            };
+            let Some(name_offset) = read_u32(bytes, symbol_entry) else {
+                continue;
+            };
+            let Some(name_offset) = usize::try_from(name_offset).ok() else {
+                continue;
+            };
+            let Some(section_index) =
+                read_u16(bytes, symbol_entry + if header.is_64 { 6 } else { 14 })
+            else {
+                continue;
+            };
             if section_index == SHN_UNDEF || name_offset >= strings_size {
                 continue;
             }
 
-            let name_at = strings_offset.checked_add(name_offset)?;
-            let name = bytes.get(name_at..)?;
-            let name_end = name.iter().position(|byte| *byte == 0)?;
+            let Some(name_at) = strings_offset.checked_add(name_offset) else {
+                continue;
+            };
+            let Some(name) = bytes.get(name_at..) else {
+                continue;
+            };
+            let Some(name_end) = name.iter().position(|byte| *byte == 0) else {
+                continue;
+            };
             if name[..name_end] != *symbol.as_bytes() {
                 continue;
             }
 
-            let value = header.word(bytes, symbol_entry + 8, symbol_entry + 4)?;
-            let value = usize::try_from(value).ok()?;
+            let Some(value) = header.word(bytes, symbol_entry + 8, symbol_entry + 4) else {
+                continue;
+            };
+            let Some(value) = usize::try_from(value).ok() else {
+                continue;
+            };
             return Some(if header.is_position_independent() {
                 base.wrapping_add(value)
             } else {
