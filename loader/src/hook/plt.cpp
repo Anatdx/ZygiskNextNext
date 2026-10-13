@@ -24,6 +24,7 @@
 #include "log.h"
 #include "utils/elf_util.h"
 
+#include <sys/mman.h>
 #include <vector>
 
 namespace znn::hook {
@@ -39,10 +40,17 @@ const MapEntry* findMapping(const std::vector<MapEntry>& maps, uintptr_t base) {
 }
 
 const MapEntry* firstMappingOfFile(const std::vector<MapEntry>& maps, const MapEntry& hit) {
+    if (hit.start < hit.offset) return &hit;
+    const uintptr_t load_base = hit.start - hit.offset;
+    const MapEntry* first_readable = nullptr;
     for (const auto& m : maps) {
-        if (m.dev == hit.dev && m.inode == hit.inode && m.offset == 0) return &m;
+        if (m.dev != hit.dev || m.inode != hit.inode) continue;
+        if (m.start < m.offset || m.start - m.offset != load_base) continue;
+        if (!(m.perms & PROT_READ)) continue;
+        if (m.offset == 0) return &m;
+        if (!first_readable) first_readable = &m;
     }
-    return &hit;
+    return first_readable ? first_readable : &hit;
 }
 
 }  //namespace
