@@ -55,6 +55,10 @@ export function getModuleDir(): string {
   return `/data/adb/modules/${MODULE_ID}`;
 }
 
+export function shellQuote(value: string): string {
+  return `'${value.split("'").join("'\\''")}'`;
+}
+
 export function apiBinary(): string {
-  return `${getModuleDir()}/bin/injector`;
+  return shellQuote(`${getModuleDir()}/bin/injector`);
 }

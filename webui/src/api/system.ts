@@ -34,7 +34,7 @@ export interface SystemInfo {
 }
 
 export async function getSystemInfo(): Promise<SystemInfo> {
-  return execJson<SystemInfo>(`'${apiBinary()}' --ctl system`);
+  return execJson<SystemInfo>(`${apiBinary()} --ctl system`);
 }
 
 export function cleanVersion(raw: string | null): string | null {

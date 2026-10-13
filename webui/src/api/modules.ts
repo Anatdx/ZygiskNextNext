@@ -38,5 +38,5 @@ export interface ZnnModule {
 }
 
 export async function getModules(): Promise<ZnnModule[]> {
-  return execJson<ZnnModule[]>(`'${apiBinary()}' --ctl modules`);
+  return execJson<ZnnModule[]>(`${apiBinary()} --ctl modules`);
 }

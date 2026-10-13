@@ -17,7 +17,7 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { apiBinary, execJson } from './ksu';
+import { apiBinary, execJson, shellQuote } from './ksu';
 
 export interface HookEngineEntry {
   value: string;
@@ -34,9 +34,9 @@ export interface HookConfig {
 export type HookKind = 'inline' | 'plt' | 'mode' | 'debugdata';
 
 export async function getHookConfig(): Promise<HookConfig> {
-  return execJson<HookConfig>(`'${apiBinary()}' --ctl config`);
+  return execJson<HookConfig>(`${apiBinary()} --ctl config`);
 }
 
 export async function setHookConfig(kind: HookKind, value: string): Promise<HookConfig> {
-  return execJson<HookConfig>(`'${apiBinary()}' --ctl config-set ${kind} ${value}`);
+  return execJson<HookConfig>(`${apiBinary()} --ctl config-set ${shellQuote(kind)} ${shellQuote(value)}`);
 }
