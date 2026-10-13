@@ -110,11 +110,14 @@ impl Daemon {
             if self.mode == Tracking::Kernel {
                 return;
             }
-            if self.mode == Tracking::Ptrace && !self.hand_over_init() {
-                logw!("tracking mode kernel needs init to be handed over; staying in ptrace mode");
-                return;
-            }
             if self.start_kernel_tracker() {
+                if self.mode == Tracking::Ptrace && !self.hand_over_init() {
+                    self.stop_kernel_tracker();
+                    logw!(
+                        "tracking mode kernel needs init to be handed over; staying in ptrace mode"
+                    );
+                    return;
+                }
                 self.mode = Tracking::Kernel;
                 self.state.dirty = true;
                 logw!("tracking mode changed to {wanted}; detached init and left /proc polling");
