@@ -33,10 +33,38 @@ export interface HookConfig {
 
 export type HookKind = 'inline' | 'plt' | 'mode' | 'debugdata';
 
+function isHookEngineEntry(value: unknown): value is HookEngineEntry {
+  if (typeof value !== 'object' || value === null) return false;
+  const entry = value as { value?: unknown; options?: unknown };
+  return (
+    typeof entry.value === 'string' &&
+    Array.isArray(entry.options) &&
+    entry.options.every((option) => typeof option === 'string')
+  );
+}
+
+function isHookConfig(value: unknown): value is HookConfig {
+  if (typeof value !== 'object' || value === null) return false;
+  const config = value as Record<string, unknown>;
+  return (
+    isHookEngineEntry(config.inlineHook) &&
+    isHookEngineEntry(config.pltHook) &&
+    isHookEngineEntry(config.mode) &&
+    isHookEngineEntry(config.debugdata)
+  );
+}
+
+function parseHookConfig(raw: unknown): HookConfig {
+  if (!isHookConfig(raw)) throw new Error('unexpected config response');
+  return raw;
+}
+
 export async function getHookConfig(): Promise<HookConfig> {
-  return execJson<HookConfig>(`${apiBinary()} --ctl config`);
+  return parseHookConfig(await execJson<unknown>(`${apiBinary()} --ctl config`));
 }
 
 export async function setHookConfig(kind: HookKind, value: string): Promise<HookConfig> {
-  return execJson<HookConfig>(`${apiBinary()} --ctl config-set ${shellQuote(kind)} ${shellQuote(value)}`);
+  return parseHookConfig(
+    await execJson<unknown>(`${apiBinary()} --ctl config-set ${shellQuote(kind)} ${shellQuote(value)}`),
+  );
 }

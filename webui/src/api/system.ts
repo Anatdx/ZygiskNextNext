@@ -33,8 +33,29 @@ export interface SystemInfo {
   root: RootImplementation;
 }
 
+function asString(value: unknown): string {
+  return typeof value === 'string' ? value : '';
+}
+
+function asRootString(value: unknown): string | null {
+  return typeof value === 'string' ? value : null;
+}
+
 export async function getSystemInfo(): Promise<SystemInfo> {
-  return execJson<SystemInfo>(`${apiBinary()} --ctl system`);
+  const raw = await execJson<unknown>(`${apiBinary()} --ctl system`);
+  const info = typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>) : {};
+  const root = typeof info.root === 'object' && info.root !== null ? (info.root as Record<string, unknown>) : {};
+  return {
+    kernel: asString(info.kernel),
+    sdk: typeof info.sdk === 'number' ? info.sdk : 0,
+    abi: asString(info.abi),
+    abilist: asString(info.abilist),
+    root: {
+      magisk: asRootString(root.magisk),
+      kernelSU: asRootString(root.kernelSU),
+      apatch: asRootString(root.apatch),
+    },
+  };
 }
 
 export function cleanVersion(raw: string | null): string | null {
