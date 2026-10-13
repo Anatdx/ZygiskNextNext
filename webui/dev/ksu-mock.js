@@ -119,10 +119,38 @@
     }
   }
 
+  function splitCommand(command) {
+    var tokens = [];
+    var current = '';
+    var quoted = false;
+    var started = false;
+    for (var i = 0; i < command.length; i++) {
+      var ch = command.charAt(i);
+      if (ch === '\\' && !quoted && i + 1 < command.length) {
+        current += command.charAt(++i);
+        started = true;
+      } else if (ch === "'") {
+        quoted = !quoted;
+        started = true;
+      } else if (!quoted && /\s/.test(ch)) {
+        if (started) {
+          tokens.push(current);
+          current = '';
+          started = false;
+        }
+      } else {
+        current += ch;
+        started = true;
+      }
+    }
+    if (started) tokens.push(current);
+    return tokens;
+  }
+
   window.ksu = {
     exec: function (command, options, callbackName) {
       window.setTimeout(function () {
-        var argc = command.split(/\s+/);
+        var argc = splitCommand(command);
         var ctl = argc.indexOf('--ctl');
         var cmd = ctl >= 0 ? argc[ctl + 1] : '';
         var operands = ctl >= 0 ? argc.slice(ctl + 2) : [];
