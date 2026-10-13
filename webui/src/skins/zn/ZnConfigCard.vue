@@ -25,6 +25,7 @@ import { useAppActions } from '../../composables/app-actions';
 import { HOOK_ROWS, UI_ROW_LABEL_KEY, hookOptionLabel, uiModeLabel } from '../../config-model';
 import { t } from '../../i18n';
 import { UI_MODES, isUiMode, setUiMode, uiMode } from '../../ui-mode';
+import ZnAlert from './ZnAlert.vue';
 import ZnCard from './ZnCard.vue';
 import ZnSelect from './ZnSelect.vue';
 
@@ -40,6 +41,7 @@ const props = defineProps<{ config: HookConfig; error?: boolean }>();
 const actions = useAppActions();
 
 const busy = ref(false);
+const failure = ref('');
 
 const rows = computed<ConfigRow[]>(() => {
   const out: ConfigRow[] = HOOK_ROWS.map((row) => {
@@ -66,6 +68,7 @@ function optionLabel(row: ConfigRow, id: string): string {
 }
 
 async function select(row: ConfigRow, value: string): Promise<void> {
+  failure.value = '';
   if (value === row.value) return;
   if (row.kind === 'ui') {
     if (isUiMode(value)) setUiMode(value);
@@ -77,6 +80,7 @@ async function select(row: ConfigRow, value: string): Promise<void> {
     await actions.applyHookConfig(row.kind as HookKind, value);
   } catch (e) {
     console.warn('[znn] config-set:', e);
+    failure.value = t('config.saveFailed');
   } finally {
     busy.value = false;
   }
@@ -97,5 +101,6 @@ async function select(row: ConfigRow, value: string): Promise<void> {
         />
       </div>
     </div>
+    <ZnAlert v-if="failure">{{ failure }}</ZnAlert>
   </ZnCard>
 </template>
