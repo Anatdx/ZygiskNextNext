@@ -110,8 +110,10 @@ impl KernelTracker {
         if crate::sys::prop::system_property("sys.boot_completed").as_deref() != Some("1") {
             return;
         }
-        self.bpf_pending = false;
-        self.bpf = start_bpf();
+        if let Some(bpf) = start_bpf() {
+            self.bpf = Some(bpf);
+            self.bpf_pending = false;
+        }
     }
 
     pub fn description(&self) -> &'static str {
