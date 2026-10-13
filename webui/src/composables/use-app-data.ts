@@ -79,7 +79,12 @@ export function useAppData(): AppData {
 
   async function applyHookConfig(kind: HookKind, value: string): Promise<void> {
     configGeneration += 1;
-    config.value = await setHookConfig(kind, value);
+    try {
+      const nextConfig = await setHookConfig(kind, value);
+      config.value = nextConfig;
+    } finally {
+      configGeneration += 1;
+    }
   }
 
   return { ksuAvailable, status, system, modules, config, loading, load, applyHookConfig };
