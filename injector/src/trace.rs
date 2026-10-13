@@ -63,6 +63,7 @@ pub struct Tracee {
     pub state: State,
     pub arch: Arch,
     pub entry: usize,
+    pub thumb: bool,
     original_instruction: [u8; INSTRUCTION_CAPACITY],
     breakpoint_size: usize,
     saved: Regs,
@@ -86,6 +87,7 @@ impl Tracee {
             state,
             arch,
             entry: 0,
+            thumb: false,
             original_instruction: [0; INSTRUCTION_CAPACITY],
             breakpoint_size: 0,
             saved: Regs::new(arch),
@@ -101,6 +103,14 @@ impl Tracee {
             file_fd: -1,
             file_name: Vec::new(),
             module_content: Vec::new(),
+        }
+    }
+
+    fn return_address(&self) -> usize {
+        if self.arch == Arch::Arm32 && self.thumb {
+            self.entry | 1
+        } else {
+            self.entry
         }
     }
 }
@@ -219,6 +229,7 @@ impl Daemon {
         }
 
         tracee.entry = entry;
+        tracee.thumb = thumb;
         tracee.loader = loader_path(self, header.is_64);
         tracee.state = State::Entry;
         tracee.deadline_ms = 0;
@@ -360,7 +371,7 @@ impl Daemon {
         function: usize,
         arguments: &[usize],
     ) -> bool {
-        if !setup_call(pid, regs, function, tracee.entry, arguments) {
+        if !setup_call(pid, regs, function, tracee.return_address(), arguments) {
             return false;
         }
         tracee.state = State::File;
@@ -449,8 +460,13 @@ impl Daemon {
         regs.set_sp(stack);
 
         let arguments = [name_address, RTLD_NOW, extinfo_address, tracee.entry];
-        if !setup_call(pid, &mut regs, dlopen_address, tracee.entry, &arguments)
-            || !write_registers(pid, &regs)
+        if !setup_call(
+            pid,
+            &mut regs,
+            dlopen_address,
+            tracee.return_address(),
+            &arguments,
+        ) || !write_registers(pid, &regs)
         {
             self.abort(pid, tracee, "cannot setup android_dlopen_ext");
             return Progress::Finished;
@@ -482,7 +498,13 @@ impl Daemon {
                 return Progress::Finished;
             };
             let mut regs = regs;
-            if !setup_call(pid, &mut regs, dlerror_address, tracee.entry, &[]) {
+            if !setup_call(
+                pid,
+                &mut regs,
+                dlerror_address,
+                tracee.return_address(),
+                &[],
+            ) {
                 loge!(
                     "dlopen({}) failed for pid {pid} (cannot resolve/call dlerror)",
                     tracee.loader
@@ -515,8 +537,13 @@ impl Daemon {
         regs.set_sp(stack);
 
         let arguments = [handle, stack, 0, 0];
-        if !setup_call(pid, &mut regs, dlsym_address, tracee.entry, &arguments[..2])
-            || !write_registers(pid, &regs)
+        if !setup_call(
+            pid,
+            &mut regs,
+            dlsym_address,
+            tracee.return_address(),
+            &arguments[..2],
+        ) || !write_registers(pid, &regs)
         {
             loge!("failed to setup dlsym for pid {pid}");
             self.undo(pid, tracee);
@@ -615,8 +642,13 @@ impl Daemon {
             companion::spawn(&module.path, plan.nonce, module.index);
         }
 
-        if !setup_call(pid, &mut regs, tracee.init_function, tracee.entry, &[stack])
-            || !write_registers(pid, &regs)
+        if !setup_call(
+            pid,
+            &mut regs,
+            tracee.init_function,
+            tracee.return_address(),
+            &[stack],
+        ) || !write_registers(pid, &regs)
         {
             self.abort(pid, tracee, "cannot enter znn_loader_init");
             return Progress::Finished;

@@ -463,6 +463,7 @@ impl Daemon {
 
         let mut tracee = Tracee::new(State::Entry, arch);
         tracee.entry = entry;
+        tracee.thumb = thumb;
         tracee.exe = exe.to_owned();
         tracee.loader = if header.is_64 {
             self.loader64.to_string_lossy().into_owned()
