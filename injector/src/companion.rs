@@ -78,6 +78,8 @@ fn memfd_from_file(path: &str) -> Option<RawFd> {
 
 fn run_helper(library: &str, nonce: u32, index: u32) -> ! {
     sys::process::set_process_name("znn-companion");
+    sys::signal::reset_to_default(sys::signal::SIGHUP);
+    sys::signal::reset_to_default(sys::signal::SIGTERM);
 
     let module = sys::dlfcn::Library::open(library).or_else(|| {
         let descriptor = memfd_from_file(library)?;

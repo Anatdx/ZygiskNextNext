@@ -49,3 +49,11 @@ pub fn set_handler(signal_number: i32, handler: extern "C" fn(i32)) {
     // and it stays installed for the remaining lifetime of the process.
     let _ = unsafe { signal::sigaction(signal, &action) };
 }
+
+pub fn reset_to_default(signal_number: i32) {
+    let Some(signal) = from_number(signal_number) else {
+        return;
+    };
+    let action = SigAction::new(SigHandler::SigDfl, SaFlags::empty(), SigSet::empty());
+    let _ = unsafe { signal::sigaction(signal, &action) };
+}
