@@ -25,16 +25,23 @@ export function isKsuAvailable(): boolean {
 }
 
 export async function execJson<T>(command: string, timeoutMs = 5000): Promise<T> {
-  const result = await Promise.race([
-    exec(command),
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error(`command timed out: ${command}`)), timeoutMs),
-    ),
-  ]);
-  if (result.errno !== 0) {
-    throw new Error(`command failed (errno ${result.errno}): ${command}\n${result.stderr}`);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const result = await Promise.race([
+      exec(command),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`command timed out: ${command}`)), timeoutMs);
+      }),
+    ]);
+    if (result.errno !== 0) {
+      throw new Error(`command failed (errno ${result.errno}): ${command}\n${result.stderr}`);
+    }
+    return JSON.parse(result.stdout.trim()) as T;
+  } finally {
+    if (timer !== undefined) {
+      clearTimeout(timer);
+    }
   }
-  return JSON.parse(result.stdout.trim()) as T;
 }
 
 export function getModuleDir(): string {
