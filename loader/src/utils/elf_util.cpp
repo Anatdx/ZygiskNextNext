@@ -186,6 +186,7 @@ void ElfImage::ensureParsed() const {
             if (!sectionInFile(sh, file_size_) || !sectionInFile(str_sh, file_size_)) continue;
             const char* strtab = reinterpret_cast<const char*>(file_ + str_sh.sh_offset);
             const ElfW(Sym)* symtab = reinterpret_cast<const ElfW(Sym)*>(file_ + sh.sh_offset);
+            if (sh.sh_entsize != sizeof(ElfW(Sym))) continue;
             size_t count = (sh.sh_entsize) ? sh.sh_size / sh.sh_entsize : 0;
             parseSymbols(&str_sh, strtab, symtab, count, bias);
         } else if (sh.sh_type == SHT_PROGBITS && strcmp(sec_name(sh), ".gnu_debugdata") == 0 &&
@@ -209,6 +210,7 @@ void ElfImage::ensureParsed() const {
             }
             const char* strtab = reinterpret_cast<const char*>(debugdata_.data() + str_sh.sh_offset);
             const ElfW(Sym)* symtab = reinterpret_cast<const ElfW(Sym)*>(debugdata_.data() + sh.sh_offset);
+            if (sh.sh_entsize != sizeof(ElfW(Sym))) continue;
             size_t count = (sh.sh_entsize) ? sh.sh_size / sh.sh_entsize : 0;
             parseSymbols(&str_sh, strtab, symtab, count, bias);
         }
