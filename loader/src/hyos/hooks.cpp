@@ -135,13 +135,15 @@ void installHooks() {
         }
     }
     if (s.spawner.inode != 0 && !s.plt_ctx_tried) {
-        s.plt_ctx_tried = true;
-        if (!s.orig_setcontext) {
+        if (s.orig_setcontext) {
+            s.plt_ctx_tried = true;
+        } else {
             void* backup = nullptr;
             if (hook::pltHook(reinterpret_cast<void*>(s.spawner.base),
                               "selinux_android_setcontext",
                               reinterpret_cast<void*>(setcontextHook), &backup)) {
                 s.orig_setcontext = reinterpret_cast<SetcontextFn>(backup);
+                s.plt_ctx_tried = true;
                 LOGI("HYOS: PLT hooked selinux_android_setcontext");
             }
         }
