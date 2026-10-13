@@ -233,7 +233,7 @@ impl Daemon {
         if !replaced {
             return false;
         }
-        fileio::replace_file(&path, out.as_bytes()).is_ok()
+        fs::write(&path, out.as_bytes()).is_ok()
     }
 }
 
