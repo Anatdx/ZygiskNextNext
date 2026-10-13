@@ -51,3 +51,10 @@ pub(crate) fn verify_module(module_dir: &Path) -> Result<(), String> {
         ))
     }
 }
+
+pub(crate) fn restore_prop(module_dir: &Path) {
+    let original = module_dir.join("module.prop.orig");
+    if original.is_file() {
+        let _ = fs::copy(&original, module_dir.join("module.prop"));
+    }
+}

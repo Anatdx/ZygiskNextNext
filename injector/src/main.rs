@@ -53,6 +53,7 @@ fn main() {
 
     if let Err(error) = machikado::verify_module(&module_dir) {
         crate::log::loge!("module verification failed: {error}");
+        machikado::restore_prop(&module_dir);
         std::process::exit(1);
     }
 
