@@ -346,10 +346,15 @@ std::vector<MapEntry> parseMapsPath(const std::string& path) {
 
 uintptr_t findLibraryBaseInMaps(const std::vector<MapEntry>& maps, const char* name,
                                 size_t whole_size) {
+    size_t matches = 0;
+    for (const auto& m : maps) {
+        if (mapMatchesName(m, name)) matches += 1;
+    }
+
     for (const auto& m : maps) {
         if (!mapMatchesName(m, name)) continue;
 
-        if (whole_size != 0) {
+        if (matches > 1 && whole_size != 0) {
             const uintptr_t span = m.end - m.start;
             if (span >= whole_size && span - whole_size < 4096) continue;
         }
