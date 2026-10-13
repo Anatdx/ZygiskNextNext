@@ -47,7 +47,7 @@ const props = defineProps<{
 const empty = computed(
   () =>
     !props.ksuAvailable ||
-    (!props.status && !props.system && !props.modules && !props.config),
+    (!props.loading && !props.status && !props.system && !props.modules && !props.config),
 );
 
 const failed = computed(
