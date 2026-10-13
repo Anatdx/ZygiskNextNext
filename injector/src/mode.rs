@@ -216,7 +216,7 @@ impl Daemon {
         }
     }
 
-    pub fn release_tracees(&mut self) {
+    pub fn release_tracees(&mut self) -> bool {
         let pending: Vec<Pid> = self
             .tracees
             .iter()
@@ -224,17 +224,20 @@ impl Daemon {
             .map(|(pid, _)| *pid)
             .collect();
 
+        let mut released = true;
         for pid in pending {
             let Some(tracee) = self.tracees.remove(&pid) else {
                 continue;
             };
             if stop_tracee(pid, INTERRUPT_TIMEOUT_MS).is_none() {
-                logw!("pid {pid} does not stop; its entry breakpoint is left in place");
+                self.tracees.insert(pid, tracee);
+                released = false;
                 continue;
             }
             release_tracee(pid, &tracee);
             ptrace::detach(pid, None);
         }
+        released
     }
 
     pub fn poll_processes(&mut self) {

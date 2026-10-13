@@ -35,10 +35,12 @@ use crate::sys::wait;
 use crate::sys::{Pid, process, signal};
 use crate::system::{self, SystemInfo};
 use crate::targets::{ModuleInfo, Target};
-use crate::trace::Tracee;
+use crate::trace::{State, Tracee};
 
 pub const MODULE_ID: &str = "zygisknextsu";
 pub const VERSION: &str = env!("ZNN_VERSION");
+
+const SHUTDOWN_RELEASE_BUDGET_MS: u64 = 800;
 
 static RESCAN: AtomicBool = AtomicBool::new(false);
 static SHUTDOWN: AtomicBool = AtomicBool::new(false);
@@ -140,7 +142,15 @@ impl Daemon {
         loop {
             if SHUTDOWN.swap(false, Ordering::SeqCst) {
                 logi!("shutting down: releasing the tracees we are holding");
-                self.release_tracees();
+                let deadline = procfs::now_ms() + SHUTDOWN_RELEASE_BUDGET_MS;
+                while !self.release_tracees() && procfs::now_ms() < deadline {
+                    thread::sleep(Duration::from_millis(25));
+                }
+                for (pid, tracee) in &self.tracees {
+                    if tracee.state != State::Traced {
+                        logw!("pid {pid} does not stop; its entry breakpoint is left in place");
+                    }
+                }
                 break;
             }
 
