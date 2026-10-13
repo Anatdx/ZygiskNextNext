@@ -84,6 +84,10 @@ int inlineUnhook(void* target) {
     if (!target) return ZN_FAILED;
 
     const uintptr_t t = reinterpret_cast<uintptr_t>(target);
+    {
+        std::lock_guard<std::mutex> lk(g_hook_mutex);
+        if (g_hooked.find(t) == g_hooked.end()) return ZN_FAILED;
+    }
     if (!znn::hook::inlineUnhook(target)) return ZN_FAILED;
 
     std::lock_guard<std::mutex> lk(g_hook_mutex);
