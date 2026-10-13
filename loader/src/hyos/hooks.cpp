@@ -34,6 +34,8 @@
 namespace znn::hyos {
 namespace {
 
+bool g_reinstall = false;
+
 //spawner image, offset-0 mapping
 void findSpawnerImage() {
     State& s = state();
@@ -79,6 +81,9 @@ pid_t forkHook() {
     pid_t res = s.orig_fork ? s.orig_fork() : -1;
     if (res == 0) {
         atForkChild();
+    } else if (res > 0 && g_reinstall) {
+        g_reinstall = false;
+        installHooks();
     }
     return res;
 }
@@ -97,7 +102,7 @@ void atForkChild() {
 void atForkPrepare() {
     State& s = state();
     if (s.module_count > 0 && (!s.orig_setcontext || !s.orig_setname)) {
-        installHooks();
+        g_reinstall = true;
     }
 }
 

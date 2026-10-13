@@ -91,8 +91,8 @@ int registerModule(const void* module) {
 
     if (!s.in_child) {
         pthread_atfork(atForkPrepare, nullptr, atForkChild);
-        installHooks();
     }
+    installHooks();
     LOGI("HYOS: module registered (%d)", s.module_count);
     return ZN_SUCCESS;
 }
