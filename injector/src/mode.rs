@@ -204,7 +204,7 @@ impl Daemon {
                 );
                 tracee.deadline_ms = procfs::now_ms() + HOLD_TIMEOUT_MS;
                 self.tracees.insert(pid, tracee);
-                break;
+                continue;
             };
 
             logw!("entry breakpoint for pid {pid} never hit (already past entry?), detaching");
