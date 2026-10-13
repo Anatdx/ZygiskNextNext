@@ -113,7 +113,7 @@ bool xhookHook(const std::string& caller_path, const char* symbol, void* replace
             return false;
         }
         g_records.erase(it);
-        if (original) *original = previous;
+        if (original) *original = restore;
         return true;
     }
 
