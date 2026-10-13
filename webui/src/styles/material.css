@@ -130,12 +130,12 @@ html[data-znn-ui='material'] .top-bar m3e-icon-button {
   --m3e-icon-button-small-icon-size: 22px;
 }
 
-html[data-znn-ui='material'] .top-bar m3e-menu,
+html[data-znn-ui='material'] .top-bar-host m3e-menu,
 html[data-znn-ui='material'] .config-row m3e-menu {
   inset-inline-start: auto !important;
 }
 
-html[data-znn-ui='material'] .top-bar m3e-menu {
+html[data-znn-ui='material'] .top-bar-host m3e-menu {
   inset-inline-end: var(--md-sys-measurement-space50) !important;
 }
 
