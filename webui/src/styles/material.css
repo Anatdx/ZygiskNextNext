@@ -304,6 +304,8 @@ html[data-znn-ui='material'] .modules-list,
 html[data-znn-ui='material'] .info-list {
   --m3e-divider-inset-start-size: 0px;
   --m3e-divider-inset-end-size: 0px;
+  --m3e-list-item-container-color: transparent;
+  --m3e-expandable-list-item-expanded-container-color: transparent;
 }
 
 html[data-znn-ui='material'] .module-line {
