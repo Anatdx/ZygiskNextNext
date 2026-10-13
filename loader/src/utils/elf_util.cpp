@@ -309,6 +309,7 @@ uintptr_t ElfImage::runtimeLookup(const char* name, size_t* size) const {
 
     for (size_t i = 1; i < max_syms; ++i) {
         const ElfW(Sym)& s = symtab[i];
+        if (s.st_shndx == SHN_UNDEF || s.st_value == 0) continue;
         if (s.st_name == 0 || s.st_name >= strsz) continue;
         if (strcmp(strtab + s.st_name, name) == 0) {
             if (size) *size = s.st_size;
