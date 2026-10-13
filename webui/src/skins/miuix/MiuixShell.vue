@@ -32,6 +32,7 @@ import { themeScheme } from '../../theme';
 import MiuixAppBar from './MiuixAppBar.vue';
 import MiuixConfigCard from './MiuixConfigCard.vue';
 import MiuixEmptyCard from './MiuixEmptyCard.vue';
+import MiuixErrorCard from './MiuixErrorCard.vue';
 import MiuixFooter from './MiuixFooter.vue';
 import MiuixInfoCard from './MiuixInfoCard.vue';
 import MiuixLargeTitle from './MiuixLargeTitle.vue';
@@ -51,6 +52,16 @@ const empty = computed(
   () =>
     !props.ksuAvailable ||
     (!props.status && !props.system && !props.modules && !props.config),
+);
+
+const failed = computed(
+  () =>
+    props.ksuAvailable &&
+    !props.loading &&
+    !props.status &&
+    !props.system &&
+    !props.modules &&
+    !props.config,
 );
 
 /**
@@ -73,7 +84,8 @@ watch(themeScheme, (scheme) => setMiuixThemeMode(scheme), { immediate: true });
         <MiuixInfoCard v-if="props.system" :system="props.system" :status="props.status" />
         <MiuixConfigCard v-if="props.config" :config="props.config" />
         <MiuixModulesCard v-if="props.modules" :modules="props.modules" />
-        <MiuixEmptyCard v-if="empty" />
+        <MiuixErrorCard v-if="failed" />
+        <MiuixEmptyCard v-else-if="empty" />
       </main>
 
       <MiuixFooter />

@@ -28,6 +28,7 @@ import type { ZnnModule } from '../../api/modules';
 import type { SystemInfo } from '../../api/system';
 import MaterialConfigCard from './MaterialConfigCard.vue';
 import MaterialEmptyCard from './MaterialEmptyCard.vue';
+import MaterialErrorCard from './MaterialErrorCard.vue';
 import MaterialFooter from './MaterialFooter.vue';
 import MaterialInfoCard from './MaterialInfoCard.vue';
 import MaterialModulesCard from './MaterialModulesCard.vue';
@@ -48,6 +49,16 @@ const empty = computed(
     !props.ksuAvailable ||
     (!props.status && !props.system && !props.modules && !props.config),
 );
+
+const failed = computed(
+  () =>
+    props.ksuAvailable &&
+    !props.loading &&
+    !props.status &&
+    !props.system &&
+    !props.modules &&
+    !props.config,
+);
 </script>
 
 <template>
@@ -58,7 +69,8 @@ const empty = computed(
     <MaterialInfoCard v-if="props.system" :system="props.system" :status="props.status" />
     <MaterialConfigCard v-if="props.config" :config="props.config" />
     <MaterialModulesCard v-if="props.modules" :modules="props.modules" />
-    <MaterialEmptyCard v-if="empty" />
+    <MaterialErrorCard v-if="failed" />
+    <MaterialEmptyCard v-else-if="empty" />
   </main>
 
   <MaterialFooter />

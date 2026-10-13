@@ -76,5 +76,7 @@ export const zhCN: Dictionary = {
 
   'empty.title': '无卡片可绘制',
 
+  'error.title': '无法从 injector 读取数据',
+
   'footer.github': 'Github',
 };

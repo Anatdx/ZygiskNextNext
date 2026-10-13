@@ -74,6 +74,8 @@ export const en: Record<string, string> = {
 
   'empty.title': 'No cards to display',
 
+  'error.title': 'Failed to load data from the injector',
+
   'footer.github': 'Github',
 };
 
