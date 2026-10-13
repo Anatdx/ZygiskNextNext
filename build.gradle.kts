@@ -5,22 +5,19 @@ plugins {
     alias(libs.plugins.agp.lib) apply false
 }
 
-fun String.execute(): String {
+fun git(vararg args: String): String {
     return try {
-        val process = ProcessBuilder(*split("\\s".toRegex()).toTypedArray())
-            .directory(layout.projectDirectory.asFile)
-            .redirectErrorStream(true)
-            .start()
-        val output = process.inputStream.bufferedReader().use { it.readText() }
-        process.waitFor()
-        output.trim()
+        providers.exec {
+            commandLine("git", *args)
+            workingDir = layout.projectDirectory.asFile
+        }.standardOutput.asText.get().trim()
     } catch (_: Exception) {
         ""
     }
 }
 
-val gitCommitCount = "git rev-list HEAD --count".execute().toIntOrNull() ?: 1
-val gitCommitHash = "git rev-parse --verify --short HEAD".execute().ifEmpty { "unknown" }
+val gitCommitCount = git("rev-list", "HEAD", "--count").toIntOrNull() ?: 1
+val gitCommitHash = git("rev-parse", "--verify", "--short", "HEAD").ifEmpty { "unknown" }
 
 // Module metadata, exposed to :loader and :module through rootProject.extra.
 val moduleId = "zygisknextsu"

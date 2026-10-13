@@ -28,4 +28,13 @@ import '@m3e/web/menu';
 import '@m3e/web/button';
 import '@m3e/web/list';
 import '@m3e/web/snackbar';
-import '@m3e/icons/rounded';
+
+import '@m3e/icons/outlined/arrow_drop_down';
+import '@m3e/icons/outlined/brightness_auto';
+import '@m3e/icons/outlined/check_circle';
+import '@m3e/icons/outlined/dark_mode';
+import '@m3e/icons/outlined/error';
+import '@m3e/icons/outlined/info';
+import '@m3e/icons/outlined/language';
+import '@m3e/icons/outlined/light_mode';
+import '@m3e/icons/outlined/refresh';
