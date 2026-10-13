@@ -28,6 +28,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <time.h>
 #include <unistd.h>
 
 namespace znn::ipc {
@@ -113,13 +114,25 @@ int acceptChannel(int listen_fd, uint32_t nonce, int timeout_ms) {
     }
 
     uint8_t proof[kNonceBytes] = {};
-    if (!waitReadable(fd, kChannelAcceptTimeoutMs)) {
-        LOGW("companion channel: helper did not send its nonce");
-        close(fd);
-        return -1;
+    struct timespec deadline {};
+    clock_gettime(CLOCK_MONOTONIC, &deadline);
+    deadline.tv_sec += kChannelAcceptTimeoutMs / 1000;
+    deadline.tv_nsec += static_cast<long>(kChannelAcceptTimeoutMs % 1000) * 1000000L;
+    if (deadline.tv_nsec >= 1000000000L) {
+        deadline.tv_sec += 1;
+        deadline.tv_nsec -= 1000000000L;
     }
     size_t off = 0;
     while (off < sizeof(proof)) {
+        struct timespec now {};
+        clock_gettime(CLOCK_MONOTONIC, &now);
+        const long remaining_ms =
+            (deadline.tv_sec - now.tv_sec) * 1000L + (deadline.tv_nsec - now.tv_nsec) / 1000000L;
+        if (!waitReadable(fd, remaining_ms > 0 ? static_cast<int>(remaining_ms) : 0)) {
+            LOGW("companion channel: helper did not send its nonce");
+            close(fd);
+            return -1;
+        }
         const ssize_t n = read(fd, proof + off, sizeof(proof) - off);
         if (n < 0 && errno == EINTR) continue;
         if (n <= 0) {
