@@ -31,10 +31,13 @@ constexpr size_t kMinPlanBytes = sizeof(ipc::Plan);
 
 bool blobString(const char* blob, size_t blob_size, ipc::PlanString ref, std::string& out) {
     if (ref.length == 0) return true;
-    const size_t end = static_cast<size_t>(ref.offset) + ref.length;
-    if (end + 1 > blob_size) return false;
+    const size_t offset = ref.offset;
+    const size_t length = ref.length;
+    if (offset > blob_size || length > blob_size - offset) return false;
+    const size_t end = offset + length;
+    if (end >= blob_size) return false;
     if (blob[end] != '\0') return false;
-    out.assign(blob + ref.offset, ref.length);
+    out.assign(blob + offset, length);
     return true;
 }
 
