@@ -228,7 +228,7 @@ impl Daemon {
                 ),
             }
         }
-        if unreadable == 2 {
+        if unreadable > 0 {
             self.state.status_reason = "cannot read the loader".to_owned();
         }
 
