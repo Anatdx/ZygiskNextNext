@@ -44,14 +44,18 @@ void setActive(bool value) { state().active = value; }
 
 void deliverAppSpecialized(const char* pkg_name, const char* se_info) {
     State& s = state();
-    if (!s.in_child || s.fired || s.module_count == 0) return;
-    s.fired = true;
+    if (!s.in_child || s.module_count == 0) return;
+    bool expected = false;
+    if (!s.fired.compare_exchange_strong(expected, true, std::memory_order_acq_rel,
+                                         std::memory_order_relaxed)) {
+        return;
+    }
 
     static char process_name[256];
     static char package_name[256];
     static char se_info_buf[64];
 
-    if (s.has_captured_name) {
+    if (s.name_state.load(std::memory_order_acquire) == kNameReady) {
         strlcpy(process_name, s.captured_name, sizeof(process_name));
     } else {
         //fallback

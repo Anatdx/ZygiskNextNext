@@ -68,11 +68,16 @@ int setcontextHook(uid_t uid, int is_system_server, const char* se_info, const c
 int setnameHook(pthread_t thread, const char* name) {
     State& s = state();
     int ret = s.orig_setname ? s.orig_setname(thread, name) : -1;
-    if (ret == 0 && !s.has_captured_name && s.in_child && !s.fired && thread == pthread_self() &&
-        name && name[0] != '\0') {
-        strlcpy(s.captured_name, name, sizeof(s.captured_name));
-        s.has_captured_name = true;
-        LOGI("HYOS: captured process name %s", s.captured_name);
+    if (ret == 0 && s.in_child && !s.fired.load(std::memory_order_relaxed) &&
+        thread == pthread_self() && name && name[0] != '\0') {
+        int expected = kNameEmpty;
+        if (s.name_state.compare_exchange_strong(expected, kNameWriting,
+                                                 std::memory_order_acq_rel,
+                                                 std::memory_order_relaxed)) {
+            strlcpy(s.captured_name, name, sizeof(s.captured_name));
+            s.name_state.store(kNameReady, std::memory_order_release);
+            LOGI("HYOS: captured process name %s", s.captured_name);
+        }
     }
     return ret;
 }
@@ -97,9 +102,9 @@ pid_t forkHook() {
 void atForkChild() {
     State& s = state();
     s.in_child = true;
-    s.fired = false;
-    s.has_captured_name = false;
+    s.fired.store(false, std::memory_order_relaxed);
     s.captured_name[0] = '\0';
+    s.name_state.store(kNameEmpty, std::memory_order_release);
     g_reinstall = false;
 }
 

@@ -24,11 +24,16 @@
 #include <pthread.h>
 #include <sys/types.h>
 
+#include <atomic>
 #include <cstdint>
 
 namespace znn::hyos {
 
 constexpr int kMaxModules = 4;
+
+constexpr int kNameEmpty = 0;
+constexpr int kNameWriting = 1;
+constexpr int kNameReady = 2;
 
 using ForkFn = pid_t (*)();
 using SetcontextFn = int (*)(uid_t uid, int is_system_server, const char* se_info,
@@ -47,7 +52,7 @@ struct State {
     ZygiskNextHyosModule modules[kMaxModules] = {};
     int module_count = 0;
     bool in_child = false;
-    bool fired = false;  //delivered already, once
+    std::atomic<bool> fired{false};  //delivered already, once
     bool warned = false;
     bool plt_fork_tried = false;
     bool plt_ctx_tried = false;
@@ -56,7 +61,7 @@ struct State {
     SetnameFn orig_setname = nullptr;
     SpawnerImage spawner{};
     char captured_name[256] = {};
-    bool has_captured_name = false;
+    std::atomic<int> name_state{kNameEmpty};
 };
 
 State& state();
