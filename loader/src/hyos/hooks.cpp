@@ -84,7 +84,9 @@ pid_t forkHook() {
         atForkChild();
     } else if (res > 0 && g_reinstall) {
         g_reinstall = false;
-        installHooks();
+        if (!s.in_child) {
+            installHooks();
+        }
     }
     return res;
 }
@@ -98,11 +100,12 @@ void atForkChild() {
     s.fired = false;
     s.has_captured_name = false;
     s.captured_name[0] = '\0';
+    g_reinstall = false;
 }
 
 void atForkPrepare() {
     State& s = state();
-    if (s.module_count > 0 && (!s.orig_setcontext || !s.orig_setname)) {
+    if (!s.in_child && s.module_count > 0 && (!s.orig_setcontext || !s.orig_setname)) {
         g_reinstall = true;
     }
 }
