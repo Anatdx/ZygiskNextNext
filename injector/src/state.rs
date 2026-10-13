@@ -138,15 +138,13 @@ impl Daemon {
                 return;
             }
         };
-        if json == self.state.last_json {
-            return;
+        if json != self.state.last_json {
+            let _ = fs::create_dir_all(paths::STATE_DIR);
+            if fileio::replace_file(paths::STATE_FILE.as_ref(), json.as_bytes()).is_ok() {
+                self.state.last_json = json;
+            }
         }
-
-        let _ = fs::create_dir_all(paths::STATE_DIR);
-        if fileio::replace_file(paths::STATE_FILE.as_ref(), json.as_bytes()).is_ok() {
-            self.state.last_json = json;
-            self.apply_prop_text();
-        }
+        self.apply_prop_text();
     }
 
     pub fn apply_prop_text(&mut self) {
