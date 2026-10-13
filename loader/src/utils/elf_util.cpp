@@ -262,8 +262,21 @@ uintptr_t ElfImage::runtimeLookup(const char* name, size_t* size) const {
 #endif
     if (eh->e_ident[EI_DATA] != ELFDATA2LSB) return 0;
 
+    const std::vector<MapEntry> maps = parseMaps("self");
+    const auto mapEnd = [&maps](uintptr_t address) -> uintptr_t {
+        for (const auto& map : maps) {
+            if (address >= map.start && address < map.end) return map.end;
+        }
+        return 0;
+    };
+
     const uint8_t* img = reinterpret_cast<const uint8_t*>(base_);
-    const ElfW(Phdr)* ph = reinterpret_cast<const ElfW(Phdr)*>(img + eh->e_phoff);
+    const uintptr_t ph_address = reinterpret_cast<uintptr_t>(img + eh->e_phoff);
+    const uintptr_t ph_map_end = mapEnd(ph_address);
+    const size_t ph_size = static_cast<size_t>(eh->e_phnum) * sizeof(ElfW(Phdr));
+    if (ph_map_end == 0 || ph_size > ph_map_end - ph_address) return 0;
+
+    const ElfW(Phdr)* ph = reinterpret_cast<const ElfW(Phdr)*>(ph_address);
     const ElfW(Dyn)* dyn = nullptr;
     for (int i = 0; i < eh->e_phnum; ++i) {
         if (ph[i].p_type == PT_DYNAMIC) {
@@ -273,10 +286,19 @@ uintptr_t ElfImage::runtimeLookup(const char* name, size_t* size) const {
     }
     if (!dyn) return 0;
 
+    const uintptr_t dyn_end = mapEnd(reinterpret_cast<uintptr_t>(dyn));
+    if (dyn_end == 0) return 0;
+
     const ElfW(Sym)* symtab = nullptr;
     const char* strtab = nullptr;
     size_t strsz = 0;
-    for (const ElfW(Dyn)* d = dyn; d->d_tag != DT_NULL; ++d) {
+    bool dyn_terminated = false;
+    for (const ElfW(Dyn)* d = dyn; reinterpret_cast<uintptr_t>(d) + sizeof(ElfW(Dyn)) <= dyn_end;
+         ++d) {
+        if (d->d_tag == DT_NULL) {
+            dyn_terminated = true;
+            break;
+        }
         switch (d->d_tag) {
             case DT_SYMTAB:
                 symtab = reinterpret_cast<const ElfW(Sym)*>(img + d->d_un.d_ptr);
@@ -291,17 +313,16 @@ uintptr_t ElfImage::runtimeLookup(const char* name, size_t* size) const {
                 break;
         }
     }
-    if (!symtab || !strtab || strsz == 0) return 0;
+    if (!dyn_terminated || !symtab || !strtab || strsz == 0) return 0;
 
     const uintptr_t symtab_address = reinterpret_cast<uintptr_t>(symtab);
-    size_t max_syms = 0;
-    for (const auto& map : parseMaps("self")) {
-        if (symtab_address >= map.start && symtab_address < map.end) {
-            max_syms = static_cast<size_t>(map.end - symtab_address) / sizeof(ElfW(Sym));
-            break;
-        }
-    }
+    const uintptr_t symtab_end = mapEnd(symtab_address);
+    if (symtab_end == 0) return 0;
+    size_t max_syms = static_cast<size_t>(symtab_end - symtab_address) / sizeof(ElfW(Sym));
+
     const uintptr_t strtab_address = reinterpret_cast<uintptr_t>(strtab);
+    const uintptr_t strtab_end = mapEnd(strtab_address);
+    if (strtab_end == 0) return 0;
     if (strtab_address > symtab_address) {
         const size_t distance =
             static_cast<size_t>(strtab_address - symtab_address) / sizeof(ElfW(Sym));
@@ -309,11 +330,17 @@ uintptr_t ElfImage::runtimeLookup(const char* name, size_t* size) const {
     }
     if (max_syms == 0) return 0;
 
+    const size_t strtab_size = static_cast<size_t>(strtab_end - strtab_address);
+    if (strsz > strtab_size) strsz = strtab_size;
+    if (strsz == 0) return 0;
+
+    const size_t name_len = strlen(name);
     for (size_t i = 1; i < max_syms; ++i) {
         const ElfW(Sym)& s = symtab[i];
         if (s.st_shndx == SHN_UNDEF || s.st_value == 0) continue;
         if (s.st_name == 0 || s.st_name >= strsz) continue;
-        if (strcmp(strtab + s.st_name, name) == 0) {
+        if (strsz - s.st_name <= name_len) continue;
+        if (memcmp(strtab + s.st_name, name, name_len + 1) == 0) {
             if (size) *size = s.st_size;
             return base_ + s.st_value;
         }
