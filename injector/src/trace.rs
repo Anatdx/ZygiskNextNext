@@ -162,8 +162,13 @@ impl Daemon {
             return;
         }
 
-        if crash_signal == signal::SIGSTOP || crash_signal == signal::SIGCHLD {
+        if crash_signal == signal::SIGSTOP {
             ptrace::cont(pid, None);
+            return;
+        }
+
+        if crash_signal == signal::SIGCHLD {
+            ptrace::cont(pid, Some(signal::SIGCHLD));
             return;
         }
 
