@@ -50,9 +50,9 @@ void loadEntry(const Plan& plan, const PlanModule& entry) {
         LOGE("%s does not export zn_module", entry.path.c_str());
         return;
     }
-    if (m->target_api_version > ZYGISK_NEXT_API_VERSION) {
-        LOGW("%s requires API version %d, only up to %d supported", entry.path.c_str(),
-             m->target_api_version, ZYGISK_NEXT_API_VERSION);
+    if (m->target_api_version < 1 || m->target_api_version > ZYGISK_NEXT_API_VERSION) {
+        LOGW("%s declares API version %d, which is not supported", entry.path.c_str(),
+             m->target_api_version);
         return;
     }
 
