@@ -23,6 +23,7 @@
 
 #include <map>
 #include <mutex>
+#include <set>
 #include <string>
 
 #ifndef __riscv
@@ -40,6 +41,7 @@ int g_init_result = -1;
 std::mutex g_mutex;
 std::map<std::string, void*> g_stubs;
 std::map<std::string, void*> g_originals;
+std::set<std::string> g_pending;
 
 std::string hookKey(const std::string& caller_path, const char* symbol) {
     std::string key = caller_path;
@@ -102,6 +104,11 @@ bool bytehookHook(const std::string& caller_path, const char* symbol, void* repl
             LOGE("pltHook %s: %s is already hooked, unhook first", symbol, caller_path.c_str());
             return false;
         }
+        if (g_pending.find(key) != g_pending.end()) {
+            LOGE("pltHook %s: %s is being installed", symbol, caller_path.c_str());
+            return false;
+        }
+        g_pending.insert(key);
     }
 
     void* backup = nullptr;
@@ -109,16 +116,25 @@ bool bytehookHook(const std::string& caller_path, const char* symbol, void* repl
         bytehook_hook_single(caller_path.c_str(), nullptr, symbol, replacement, bytehookHooked,
                              &backup);
     if (!stub) {
+        {
+            std::lock_guard<std::mutex> lk(g_mutex);
+            g_pending.erase(key);
+        }
         LOGE("pltHook %s: bytehook_hook_single failed for %s", symbol, caller_path.c_str());
         return false;
     }
     if (!backup) {
         LOGE("pltHook %s: no matching relocation in %s", symbol, caller_path.c_str());
         bytehook_unhook(stub);
+        {
+            std::lock_guard<std::mutex> lk(g_mutex);
+            g_pending.erase(key);
+        }
         return false;
     }
     {
         std::lock_guard<std::mutex> lk(g_mutex);
+        g_pending.erase(key);
         g_stubs[key] = stub;
         g_originals[key] = backup;
     }
