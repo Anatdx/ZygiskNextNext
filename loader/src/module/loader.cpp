@@ -59,13 +59,9 @@ void loadEntry(const Plan& plan, const PlanModule& entry) {
     auto* handle = new ModuleHandle();
     handle->lib_path = entry.path;
 
-    if (entry.companion && m->target_api_version >= 3) {
+    if (entry.companion) {
         handle->companion_nonce = plan.nonce;
         handle->companion_listen_fd = openCompanionChannel(plan, entry);
-    } else if (entry.companion) {
-        LOGW("module %s declares companion but targets API %d (< 3), "
-             "skipping companion process",
-             entry.path.c_str(), m->target_api_version);
     }
 
     LOGI("loading module %s (companion=%s, api=%d)", entry.path.c_str(),
