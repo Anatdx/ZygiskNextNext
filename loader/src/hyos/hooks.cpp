@@ -111,13 +111,17 @@ void installHooks() {
     findSpawnerImage();
 
     if (s.spawner.inode != 0 && !s.plt_fork_tried) {
-        s.plt_fork_tried = true;
-        if (!s.orig_fork) {
+        if (s.orig_fork) {
+            s.plt_fork_tried = true;
+        } else {
             void* backup = nullptr;
             if (hook::pltHook(reinterpret_cast<void*>(s.spawner.base), "fork",
                               reinterpret_cast<void*>(forkHook), &backup)) {
                 s.orig_fork = reinterpret_cast<ForkFn>(backup);
+                s.plt_fork_tried = true;
                 LOGI("HYOS: PLT hooked fork");
+            } else {
+                LOGW("HYOS: cannot hook fork, app specialization will not fire");
             }
         }
     }
