@@ -25,6 +25,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -73,6 +74,7 @@ private:
     mutable std::vector<uint8_t> debugdata_;
     mutable const ElfW(Ehdr)* debugdata_ehdr_ = nullptr;
 
+    mutable std::mutex parse_mutex_;
     mutable bool parsed_ = false;
     mutable std::vector<SymbolInfo> symbols_;
 };

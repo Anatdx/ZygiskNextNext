@@ -33,6 +33,7 @@
 #include <unistd.h>
 
 #include <cstring>
+#include <mutex>
 #include <unordered_set>
 
 #define ELF_LOGW(...) __android_log_print(ANDROID_LOG_WARN, "ZNNloader", __VA_ARGS__)
@@ -160,6 +161,7 @@ bool ElfImage::parseGnuDebugData(const uint8_t* data, size_t size) const {
 }
 
 void ElfImage::ensureParsed() const {
+    std::lock_guard<std::mutex> lock(parse_mutex_);
     if (parsed_) return;
     parsed_ = true;
 
