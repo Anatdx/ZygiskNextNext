@@ -43,10 +43,12 @@ export function useAppData(): AppData {
   const modules = ref<ZnnModule[] | null>(null);
   const config = ref<HookConfig | null>(null);
   const loading = ref(false);
+  let configGeneration = 0;
 
   async function load(): Promise<void> {
     if (!ksuAvailable || loading.value) return;
     loading.value = true;
+    const generation = configGeneration;
     try {
       const [nextStatus, nextSystem, nextModules, nextConfig] = await Promise.all([
         getInjectorStatus().catch((e) => {
@@ -69,13 +71,14 @@ export function useAppData(): AppData {
       status.value = nextStatus;
       system.value = nextSystem;
       modules.value = nextModules;
-      config.value = nextConfig;
+      if (generation === configGeneration) config.value = nextConfig;
     } finally {
       loading.value = false;
     }
   }
 
   async function applyHookConfig(kind: HookKind, value: string): Promise<void> {
+    configGeneration += 1;
     config.value = await setHookConfig(kind, value);
   }
 
