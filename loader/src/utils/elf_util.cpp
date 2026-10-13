@@ -289,10 +289,21 @@ uintptr_t ElfImage::runtimeLookup(const char* name, size_t* size) const {
     }
     if (!symtab || !strtab || strsz == 0) return 0;
 
-    const char* sym_end = reinterpret_cast<const char*>(symtab);
-    size_t max_syms = strtab > sym_end ? static_cast<size_t>(strtab - sym_end) / sizeof(ElfW(Sym))
-                                       : 0;
-    if (max_syms == 0 || max_syms > (1u << 20)) max_syms = 1u << 20;
+    const uintptr_t symtab_address = reinterpret_cast<uintptr_t>(symtab);
+    size_t max_syms = 0;
+    for (const auto& map : parseMaps("self")) {
+        if (symtab_address >= map.start && symtab_address < map.end) {
+            max_syms = static_cast<size_t>(map.end - symtab_address) / sizeof(ElfW(Sym));
+            break;
+        }
+    }
+    const uintptr_t strtab_address = reinterpret_cast<uintptr_t>(strtab);
+    if (strtab_address > symtab_address) {
+        const size_t distance =
+            static_cast<size_t>(strtab_address - symtab_address) / sizeof(ElfW(Sym));
+        if (distance < max_syms) max_syms = distance;
+    }
+    if (max_syms == 0) return 0;
 
     for (size_t i = 1; i < max_syms; ++i) {
         const ElfW(Sym)& s = symtab[i];
