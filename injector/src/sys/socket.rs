@@ -24,6 +24,8 @@ use std::os::fd::RawFd;
 use nix::cmsg_space;
 use nix::sys::socket::{self, ControlMessageOwned, MsgFlags, UnixAddr};
 
+use super::fs;
+
 pub fn recv_with_fd(socket: RawFd, payload: &mut [u8]) -> io::Result<(usize, Option<RawFd>)> {
     let mut payload = [IoSliceMut::new(payload)];
     let mut control = cmsg_space!([RawFd; 1]);
@@ -40,12 +42,26 @@ pub fn recv_with_fd(socket: RawFd, payload: &mut [u8]) -> io::Result<(usize, Opt
         }
     };
 
-    let mut descriptor = None;
-    for control in message.cmsgs().map_err(io::Error::from)? {
-        if let ControlMessageOwned::ScmRights(descriptors) = control {
-            descriptor = descriptors.first().copied();
-            break;
+    let mut descriptors = Vec::new();
+    let controls = message.cmsgs();
+    if message.flags.contains(MsgFlags::MSG_CTRUNC) {
+        for fd in descriptors.drain(..) {
+            fs::close(fd);
         }
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "control data was truncated",
+        ));
+    }
+    for control in controls.map_err(io::Error::from)? {
+        if let ControlMessageOwned::ScmRights(received) = control {
+            descriptors.extend(received);
+        }
+    }
+
+    let descriptor = descriptors.first().copied();
+    for &fd in descriptors.iter().skip(1) {
+        fs::close(fd);
     }
     Ok((message.bytes, descriptor))
 }
