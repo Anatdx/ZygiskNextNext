@@ -49,6 +49,7 @@ const abiText = computed(() => {
 });
 
 const modeText = computed(() => {
+  if (!props.status?.running) return t('info.unknown');
   const mode = props.status?.mode;
   if (mode === 'kernel') return t('config.mode.kernel');
   if (mode === 'proc') return t('config.mode.proc');
