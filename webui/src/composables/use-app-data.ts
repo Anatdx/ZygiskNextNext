@@ -42,11 +42,13 @@ export function useAppData(): AppData {
   const system = ref<SystemInfo | null>(null);
   const modules = ref<ZnnModule[] | null>(null);
   const config = ref<HookConfig | null>(null);
-  const loading = ref(false);
+  const loading = ref(ksuAvailable);
   let configGeneration = 0;
+  let inFlight = false;
 
   async function load(): Promise<void> {
-    if (!ksuAvailable || loading.value) return;
+    if (!ksuAvailable || inFlight) return;
+    inFlight = true;
     loading.value = true;
     const generation = configGeneration;
     try {
@@ -74,6 +76,7 @@ export function useAppData(): AppData {
       if (generation === configGeneration && nextConfig !== null) config.value = nextConfig;
     } finally {
       loading.value = false;
+      inFlight = false;
     }
   }
 
