@@ -19,9 +19,11 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
+use std::io;
 use std::path::{Path, PathBuf};
 
 use crate::daemon::Daemon;
+use crate::log::logw;
 use crate::paths;
 use crate::procfs::{self, basename};
 use crate::sys::Pid;
@@ -82,9 +84,9 @@ pub fn parse_declaration(line: &str) -> Option<Declaration> {
     })
 }
 
-pub fn declarations(module_dir: &Path) -> Option<Vec<Declaration>> {
-    let contents = fs::read_to_string(module_dir.join("zn_modules.txt")).ok()?;
-    Some(contents.lines().filter_map(parse_declaration).collect())
+pub fn declarations(module_dir: &Path) -> io::Result<Vec<Declaration>> {
+    let contents = fs::read_to_string(module_dir.join("zn_modules.txt"))?;
+    Ok(contents.lines().filter_map(parse_declaration).collect())
 }
 
 pub fn is_enabled(module_dir: &Path) -> bool {
@@ -110,8 +112,15 @@ pub fn read_prop(module_dir: &Path, key: &str) -> String {
 
 pub fn collect(previous: &BTreeMap<String, ModuleInfo>) -> BTreeMap<String, ModuleInfo> {
     let mut modules = BTreeMap::new();
-    let Ok(entries) = fs::read_dir(paths::MODULES_DIR) else {
-        return modules;
+    let entries = match fs::read_dir(paths::MODULES_DIR) {
+        Ok(entries) => entries,
+        Err(error) => {
+            logw!(
+                "cannot list {}: {error}; keeping the previous module table",
+                paths::MODULES_DIR
+            );
+            return previous.clone();
+        }
     };
 
     for entry in entries.flatten() {
@@ -126,8 +135,19 @@ pub fn collect(previous: &BTreeMap<String, ModuleInfo>) -> BTreeMap<String, Modu
         if !is_enabled(&module_dir) {
             continue;
         }
-        let Some(declarations) = declarations(&module_dir) else {
-            continue;
+        let declarations = match declarations(&module_dir) {
+            Ok(declarations) => declarations,
+            Err(error) if error.kind() == io::ErrorKind::NotFound => continue,
+            Err(error) => {
+                logw!(
+                    "cannot read {}: {error}; keeping the previous record",
+                    module_dir.join("zn_modules.txt").display()
+                );
+                if let Some(previous) = previous.get(id) {
+                    modules.insert(previous.id.clone(), previous.clone());
+                }
+                continue;
+            }
         };
 
         let mut module = ModuleInfo {
