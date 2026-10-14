@@ -129,6 +129,7 @@ impl Daemon {
         signal::set_handler(signal::SIGTERM, on_sigterm);
 
         daemon.collect_targets();
+        daemon.restore_processes();
         logi!("collected {} zn modules", daemon.targets.len());
 
         daemon.select_mode();

@@ -20,16 +20,18 @@
 use std::fmt::Write as _;
 use std::fs;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::config;
 use crate::daemon::{Daemon, MODULE_ID, Tracking, VERSION};
 use crate::fileio;
-use crate::log::loge;
+use crate::log::{loge, logi, logw};
 use crate::paths;
+use crate::procfs;
+use crate::sys::Pid;
 use crate::sys::fs as raw_fs;
 use crate::system::{self, RootImpl};
-use crate::targets::ModuleInfo;
+use crate::targets::{self, ModuleInfo};
 
 /// The snapshot the WebUI reads through `injector --ctl`.
 #[derive(Debug, Serialize)]
@@ -98,6 +100,28 @@ struct FailedReport<'a> {
     reason: &'a str,
 }
 
+#[derive(Debug, Deserialize)]
+struct Snapshot {
+    #[serde(default)]
+    modules: Vec<SnapshotModule>,
+}
+
+#[derive(Debug, Deserialize)]
+struct SnapshotModule {
+    #[serde(default)]
+    id: String,
+    #[serde(default)]
+    processes: Vec<SnapshotProcess>,
+}
+
+#[derive(Debug, Deserialize)]
+struct SnapshotProcess {
+    #[serde(default)]
+    pid: i64,
+    #[serde(default)]
+    name: String,
+}
+
 #[derive(Debug, Default)]
 pub struct StateWriter {
     pub dirty: bool,
@@ -107,6 +131,48 @@ pub struct StateWriter {
 }
 
 impl Daemon {
+    pub fn restore_processes(&mut self) {
+        let Some(recorded_modules) = read_snapshot_modules() else {
+            return;
+        };
+        let mut records = 0;
+        let mut modules_restored = 0;
+        for recorded in recorded_modules {
+            let Some(module) = self.modules.get_mut(&recorded.id) else {
+                continue;
+            };
+            let before = module.processes.len();
+            for recorded_process in recorded.processes {
+                let Ok(pid) = Pid::try_from(recorded_process.pid) else {
+                    continue;
+                };
+                if module.processes.iter().any(|(known, _)| *known == pid) {
+                    continue;
+                }
+                if procfs::process_gone(pid) {
+                    continue;
+                }
+                let exe = procfs::read_exe_path(pid);
+                if !targets::module_matches(module, &exe) {
+                    continue;
+                }
+                module.processes.push((pid, recorded_process.name));
+            }
+            let restored = module.processes.len() - before;
+            records += restored;
+            if restored > 0 {
+                modules_restored += 1;
+            }
+        }
+        if records > 0 {
+            self.state.dirty = true;
+            logi!(
+                "restored {records} injected process record(s) across {modules_restored} module(s) \
+                 from the state snapshot"
+            );
+        }
+    }
+
     pub fn state_report(&self) -> StateReport<'_> {
         StateReport {
             running: true,
@@ -232,6 +298,20 @@ impl Daemon {
             return false;
         }
         crate::fileio::replace_file(&path, out.as_bytes()).is_ok()
+    }
+}
+
+fn read_snapshot_modules() -> Option<Vec<SnapshotModule>> {
+    let contents = fs::read_to_string(paths::STATE_FILE).ok()?;
+    match serde_json::from_str::<Snapshot>(&contents) {
+        Ok(snapshot) => Some(snapshot.modules),
+        Err(error) => {
+            logw!(
+                "cannot parse {}: {error}; the injected processes are not restored",
+                paths::STATE_FILE
+            );
+            None
+        }
     }
 }
 
