@@ -150,7 +150,9 @@ fn find_symbol(bytes: &[u8], header: &ElfHeader, base: usize, symbol: &str) -> O
         let strings_size =
             usize::try_from(header.word(bytes, strings_header + 32, strings_header + 20)?).ok()?;
 
-        for entry in 0..entries_size / entry_stride {
+        let available = bytes.len().saturating_sub(entries_offset);
+        let limit = entries_size.min(available) / entry_stride;
+        for entry in 0..limit {
             let Some(entry_offset) = entry.checked_mul(entry_stride) else {
                 continue;
             };
