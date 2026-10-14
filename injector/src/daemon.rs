@@ -143,6 +143,7 @@ impl Daemon {
         loop {
             if SHUTDOWN.swap(false, Ordering::SeqCst) {
                 logi!("shutting down: releasing the tracees we are holding");
+                self.write_state_snapshot();
                 let deadline = procfs::now_ms() + SHUTDOWN_RELEASE_BUDGET_MS;
                 while !self.release_tracees() && procfs::now_ms() < deadline {
                     thread::sleep(Duration::from_millis(25));
