@@ -43,7 +43,11 @@ pub fn recv_with_fd(socket: RawFd, payload: &mut [u8]) -> io::Result<(usize, Opt
     };
 
     let mut descriptors = Vec::new();
-    let controls = message.cmsgs();
+    for control in message.cmsgs().map_err(io::Error::from)? {
+        if let ControlMessageOwned::ScmRights(received) = control {
+            descriptors.extend(received);
+        }
+    }
     if message.flags.contains(MsgFlags::MSG_CTRUNC) {
         for fd in descriptors.drain(..) {
             fs::close(fd);
@@ -52,11 +56,6 @@ pub fn recv_with_fd(socket: RawFd, payload: &mut [u8]) -> io::Result<(usize, Opt
             io::ErrorKind::InvalidData,
             "control data was truncated",
         ));
-    }
-    for control in controls.map_err(io::Error::from)? {
-        if let ControlMessageOwned::ScmRights(received) = control {
-            descriptors.extend(received);
-        }
     }
 
     let descriptor = descriptors.first().copied();
