@@ -57,5 +57,21 @@ fn main() {
         std::process::exit(1);
     }
 
+    let deadline = std::time::Instant::now() + std::time::Duration::from_millis(3000);
+    let mut reported = false;
+    while let Some(pid) = procfs::find_daemon_pid(None) {
+        if !reported {
+            crate::log::logi!("waiting for the previous injector daemon ({pid}) to exit");
+            reported = true;
+        }
+        if std::time::Instant::now() >= deadline {
+            crate::log::loge!(
+                "an injector daemon ({pid}) is already running, refusing to start a second instance"
+            );
+            std::process::exit(1);
+        }
+        std::thread::sleep(std::time::Duration::from_millis(100));
+    }
+
     daemon::Daemon::new(module_dir).run();
 }
