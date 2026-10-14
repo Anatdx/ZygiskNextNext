@@ -593,6 +593,11 @@ impl Daemon {
             .enumerate()
             .map(|(index, library)| PlanModule::new(index as u32, library.path, library.companion))
             .collect();
+        if tracee.modules.is_empty() {
+            loge!("pid {pid}: no module library to load");
+            self.give_up(pid, tracee, "no module library to load");
+            return Progress::Finished;
+        }
         tracee.module_index = 0;
         tracee.nonce = plan::fresh_nonce();
         logi!(
