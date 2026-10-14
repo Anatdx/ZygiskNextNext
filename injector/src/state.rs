@@ -125,7 +125,6 @@ struct SnapshotProcess {
 #[derive(Debug, Default)]
 pub struct StateWriter {
     pub dirty: bool,
-    last_json: String,
     pub status_reason: String,
     last_prop_text: String,
 }
@@ -204,11 +203,10 @@ impl Daemon {
                 return;
             }
         };
-        if json != self.state.last_json {
+        let on_disk = fs::read_to_string(paths::STATE_FILE).ok();
+        if on_disk.as_deref() != Some(json.as_str()) {
             let _ = fs::create_dir_all(paths::STATE_DIR);
-            if fileio::replace_file(paths::STATE_FILE.as_ref(), json.as_bytes()).is_ok() {
-                self.state.last_json = json;
-            }
+            let _ = fileio::replace_file(paths::STATE_FILE.as_ref(), json.as_bytes());
         }
         self.apply_prop_text();
     }
