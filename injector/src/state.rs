@@ -152,7 +152,7 @@ impl Daemon {
                     continue;
                 }
                 let exe = procfs::read_exe_path(pid);
-                if !targets::module_matches(module, &exe) {
+                if !exe.is_empty() && !targets::module_matches(module, &exe) {
                     continue;
                 }
                 module.processes.push((pid, recorded_process.name));
