@@ -73,8 +73,29 @@ pub fn read_exe_path(pid: Pid) -> String {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Liveness {
+    Alive,
+    Gone,
+    Unknown,
+}
+
+fn liveness(pid: Pid) -> Liveness {
+    match fs::read_link(format!("/proc/{pid}/exe")) {
+        Ok(_) => Liveness::Alive,
+        Err(error) => match error.raw_os_error() {
+            Some(libc::ENOENT | libc::ESRCH) => Liveness::Gone,
+            _ => Liveness::Unknown,
+        },
+    }
+}
+
+pub fn process_gone(pid: Pid) -> bool {
+    matches!(liveness(pid), Liveness::Gone)
+}
+
 pub fn is_alive(pid: Pid) -> bool {
-    !read_exe_path(pid).is_empty()
+    !process_gone(pid)
 }
 
 pub fn map_path_equals_exe(map_path: &str, exe: &str) -> bool {

@@ -218,7 +218,13 @@ impl Daemon {
         }
 
         let exe = procfs::read_exe_path(pid);
-        if exe.is_empty() || !crate::targets::matches(&self.targets, &exe) {
+        if exe.is_empty() {
+            if procfs::process_gone(pid) {
+                self.ignored.insert(pid);
+            }
+            return;
+        }
+        if !crate::targets::matches(&self.targets, &exe) {
             self.ignored.insert(pid);
             return;
         }
