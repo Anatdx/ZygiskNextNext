@@ -476,7 +476,6 @@ impl Daemon {
         tracee.deadline_ms = procfs::now_ms() + 3000;
         if !set_entry_breakpoint(pid, &mut tracee, thumb) {
             logw!("{exe} (pid {pid}): cannot arm the entry breakpoint; skipping");
-            self.record_failure(pid, exe, "could not arm the entry breakpoint");
             ptrace::detach(pid, None);
             return Seizure::GiveUp;
         }
