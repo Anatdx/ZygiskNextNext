@@ -28,6 +28,7 @@ val minKsuVersion: Int = rootProject.extra["minKsuVersion"] as Int
 val minKsudVersion: Int = rootProject.extra["minKsudVersion"] as Int
 val minMagiskVersion: Int = rootProject.extra["minMagiskVersion"] as Int
 val minApatchVersion: Int = rootProject.extra["minApatchVersion"] as Int
+val kpmId: String = "zygisk-next-next"
 val commitHash: String = rootProject.extra["commitHash"] as String
 val updateUrl: String = rootProject.extra["updateUrl"] as String
 
@@ -131,6 +132,7 @@ androidComponents.onVariants { variant ->
                 "MIN_KSUD_VERSION" to "$minKsudVersion",
                 "MIN_MAGISK_VERSION" to "$minMagiskVersion",
                 "MIN_APATCH_VERSION" to "$minApatchVersion",
+                "KPM_ID" to kpmId,
             )
             filter<ReplaceTokens>("tokens" to tokens)
             filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))

@@ -6,6 +6,7 @@ MIN_KSU_VERSION=@MIN_KSU_VERSION@
 MIN_KSUD_VERSION=@MIN_KSUD_VERSION@
 MIN_MAGISK_VERSION=@MIN_MAGISK_VERSION@
 MIN_APATCH_VERSION=@MIN_APATCH_VERSION@
+KPM_ID=@KPM_ID@
 
 if [ "$BOOTMODE" ] && [ "$KSU" ]; then
   ui_print "- Installing from KernelSU app"
@@ -130,6 +131,17 @@ elif [ "$ARCH" = "riscv64" ]; then
   extract "$ZIPFILE" 'lib/riscv64/libloader.so' "$MODPATH/lib" true
   extract "$ZIPFILE" 'lib/riscv64/libloader.so' "$MODPATH/lib64" true
   extract "$ZIPFILE" 'bin/riscv64/injector' "$MODPATH/bin" true
+fi
+
+if [ "$APATCH" ] && [ "$ARCH" = "arm64" ]; then
+  if [ "$APATCH_VER_CODE" -ge 11278 ]; then
+    ui_print "- Installing KernelPatch module"
+    mkdir -p "/data/adb/ap/kpm/$KPM_ID"
+    extract "$ZIPFILE" 'znn.kpm' "/data/adb/ap/kpm/$KPM_ID"
+    mv -f "/data/adb/ap/kpm/$KPM_ID/znn.kpm" "/data/adb/ap/kpm/$KPM_ID/$KPM_ID.kpm"
+    chmod 600 "/data/adb/ap/kpm/$KPM_ID/$KPM_ID.kpm"
+    chown 0:0 "/data/adb/ap/kpm/$KPM_ID/$KPM_ID.kpm" 2>/dev/null || true
+  fi
 fi
 
 unzip -o "$ZIPFILE" "webroot/*" -x "*.sha256" -d "$MODPATH"
