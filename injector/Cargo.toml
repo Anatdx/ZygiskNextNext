@@ -1,6 +1,6 @@
 [package]
 name = "injector"
-version = "1.9.0"
+version = "1.10.0"
 edition = "2024"
 description = "A from-scratch, standalone implementation of the Zygisk Next module."
 license = "GPL-3.0-or-later"
