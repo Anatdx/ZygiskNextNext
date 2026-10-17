@@ -6,6 +6,8 @@ val ndkVersion: String = rootProject.extra["androidNdkVersion"] as String
 val requestedMode: String? = (findProperty("kpm") as? String)?.trim()?.lowercase()
 val kpmDisabled = requestedMode == "false" || requestedMode == "off" || requestedMode == "no"
 
+val kpmBtf = (findProperty("kpmBtf") as? String)?.trim()?.lowercase() in setOf("true", "on", "yes", "1")
+
 val manifestFile = file("version.properties")
 
 val compilerFlags = listOf(
@@ -141,6 +143,7 @@ fun buildKpm(toolchain: KpmToolchain, outputDirectory: File): File {
         add(toolchain.clang.absolutePath)
         addAll(compilerFlags)
         add("-DZNN_KPM_VERSION=\"$version\"")
+        if (kpmBtf) add("-DZNN_WITH_BTF=1")
         includeDirectories.forEach { add("-I${file(it).absolutePath}") }
         add("-c")
         add(source.absolutePath)
@@ -179,6 +182,7 @@ listOf("debug", "release").forEach { variant ->
         inputs.dir(file("external/kpatch"))
         inputs.file(manifestFile)
         inputs.property("kpm", requestedMode ?: "auto")
+        inputs.property("kpmBtf", kpmBtf)
         outputs.dir(outputDirectory)
 
         doLast {

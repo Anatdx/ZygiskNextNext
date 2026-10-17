@@ -22,7 +22,9 @@
 #include <hook.h>
 #include <syscall.h>
 #include <kputils.h>
+#ifdef ZNN_WITH_BTF
 #include <kbtf.h>
+#endif
 #include <asm/current.h>
 #include <linux/printk.h>
 #include <uapi/asm-generic/unistd.h>
@@ -234,6 +236,7 @@ static long znn_init(const char *args, const char *event, void *reserved)
 
     znn_task_pid_nr_ns =
         (int32_t(*)(void *, int, void *))(uintptr_t)kallsyms_lookup_name("__task_pid_nr_ns");
+#ifdef ZNN_WITH_BTF
     long parent_offset = kp_btf_member_offset("task_struct", "real_parent");
     if (parent_offset > 0) znn_real_parent_offset = parent_offset;
 
@@ -243,6 +246,9 @@ static long znn_init(const char *args, const char *event, void *reserved)
         znn_task_cred_offset = cred_offset;
         znn_cred_uid_offset = cred_uid_offset;
     }
+#else
+    pr_info("znn: built without BTF lookups, ppid is -1 and every caller is served\n");
+#endif
 
     hook_err_t error = hook_syscalln(__NR_execve, 3, znn_before_execve, 0, 0);
     if (error) {
@@ -267,8 +273,10 @@ static long znn_init(const char *args, const char *event, void *reserved)
         znn_channel_hooked = 1;
     }
 
+#ifdef ZNN_WITH_BTF
     if (znn_task_cred_offset < 0)
         pr_info("znn: cred offsets unresolved, uid gate disabled, serving every caller\n");
+#endif
 
     pr_info("znn %s ready (real_parent offset %ld, pid source %s, uid gate %s, channel %s)\n", ZNN_KPM_VERSION,
             znn_real_parent_offset, znn_task_pid_nr_ns ? "__task_pid_nr_ns" : "unavailable",
