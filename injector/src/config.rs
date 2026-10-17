@@ -37,12 +37,16 @@ pub const MODE_LATE: &str = "late";
 pub const DEBUGDATA_LZMA: &str = "lzma";
 pub const DEBUGDATA_XZ: &str = "xz";
 
+pub const DISABLE_ZN_TRUE: &str = "true";
+pub const DISABLE_ZN_FALSE: &str = "false";
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct HookConfig {
     pub inline_hook: String,
     pub plt_hook: String,
     pub mode: String,
     pub debugdata: String,
+    pub disable_zn: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -59,6 +63,8 @@ pub struct HookConfigReport {
     plt_hook: HookOption,
     mode: HookOption,
     debugdata: HookOption,
+    #[serde(rename = "disableZn")]
+    disable_zn: HookOption,
 }
 
 pub fn inline_hook_options() -> Vec<&'static str> {
@@ -86,6 +92,10 @@ pub fn debugdata_options() -> Vec<&'static str> {
     vec![DEBUGDATA_LZMA, DEBUGDATA_XZ]
 }
 
+pub fn disable_zn_options() -> Vec<&'static str> {
+    vec![DISABLE_ZN_TRUE, DISABLE_ZN_FALSE]
+}
+
 pub fn option_in(options: &[&str], value: &str) -> bool {
     options.contains(&value)
 }
@@ -97,6 +107,7 @@ impl HookConfig {
             "plt" => Some(plt_hook_options()),
             "mode" => Some(tracking_mode_options()),
             "debugdata" => Some(debugdata_options()),
+            "disable-zn" => Some(disable_zn_options()),
             _ => None,
         }
     }
@@ -107,6 +118,7 @@ impl HookConfig {
             "plt" => self.plt_hook = value.to_owned(),
             "mode" => self.mode = value.to_owned(),
             "debugdata" => self.debugdata = value.to_owned(),
+            "disable-zn" => self.disable_zn = value.to_owned(),
             _ => {}
         }
     }
@@ -129,6 +141,10 @@ impl HookConfig {
                 value: self.debugdata.clone(),
                 options: debugdata_options(),
             },
+            disable_zn: HookOption {
+                value: self.disable_zn.clone(),
+                options: disable_zn_options(),
+            },
         }
     }
 }
@@ -138,6 +154,7 @@ pub fn effective() -> HookConfig {
     let plt_options = plt_hook_options();
     let mode_options = tracking_mode_options();
     let debugdata_choices = debugdata_options();
+    let disable_zn_choices = disable_zn_options();
     let mut config = HookConfig {
         inline_hook: inline_options
             .first()
@@ -151,6 +168,7 @@ pub fn effective() -> HookConfig {
             .copied()
             .unwrap_or_default()
             .to_owned(),
+        disable_zn: DISABLE_ZN_TRUE.to_owned(),
     };
 
     let Some(stored) = read_file() else {
@@ -168,14 +186,17 @@ pub fn effective() -> HookConfig {
     if option_in(&debugdata_choices, &stored.debugdata) {
         config.debugdata = stored.debugdata;
     }
+    if option_in(&disable_zn_choices, &stored.disable_zn) {
+        config.disable_zn = stored.disable_zn;
+    }
     config
 }
 
 pub fn write(config: &HookConfig) -> bool {
     let _ = fs::create_dir_all(paths::STATE_DIR);
     let contents = format!(
-        "inline_hook={}\nplt_hook={}\nmode={}\ndebugdata={}\n",
-        config.inline_hook, config.plt_hook, config.mode, config.debugdata
+        "inline_hook={}\nplt_hook={}\nmode={}\ndebugdata={}\ndisable_zn={}\n",
+        config.inline_hook, config.plt_hook, config.mode, config.debugdata, config.disable_zn
     );
     crate::fileio::replace_file(paths::CONFIG_FILE.as_ref(), contents.as_bytes()).is_ok()
 }
@@ -185,6 +206,7 @@ struct StoredConfig {
     plt_hook: String,
     mode: String,
     debugdata: String,
+    disable_zn: String,
 }
 
 fn read_file() -> Option<StoredConfig> {
@@ -194,6 +216,7 @@ fn read_file() -> Option<StoredConfig> {
         plt_hook: String::new(),
         mode: String::new(),
         debugdata: String::new(),
+        disable_zn: String::new(),
     };
 
     for line in contents.lines() {
@@ -212,6 +235,7 @@ fn read_file() -> Option<StoredConfig> {
             "plt_hook" => stored.plt_hook = value.to_owned(),
             "mode" => stored.mode = value.to_owned(),
             "debugdata" => stored.debugdata = value.to_owned(),
+            "disable_zn" => stored.disable_zn = value.to_owned(),
             _ => {}
         }
     }

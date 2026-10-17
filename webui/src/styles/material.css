@@ -290,6 +290,10 @@ html[data-znn-ui='material'] .config-value > span {
   white-space: nowrap;
 }
 
+html[data-znn-ui='material'] .config-switch {
+  flex: none;
+}
+
 html[data-znn-ui='material'] .config-row m3e-menu {
   inset-inline-end: var(--znn-menu-inline-end, 0px) !important;
 }

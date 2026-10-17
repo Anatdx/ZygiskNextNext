@@ -42,13 +42,23 @@ export const HOOK_ROWS: HookRow[] = [
   { kind: 'plt', field: 'pltHook', labelKey: 'config.pltHook' },
   { kind: 'mode', field: 'mode', labelKey: 'config.mode' },
   { kind: 'debugdata', field: 'debugdata', labelKey: 'config.debugdata' },
+  { kind: 'disable-zn', field: 'disableZn', labelKey: 'config.disableZn' },
 ];
 
 export const UI_ROW_LABEL_KEY = 'config.uiStyle';
 
+export function configRows<T>(map: (row: HookRow) => T, uiRow: T): T[] {
+  const bottom = HOOK_ROWS.filter((row) => row.kind === 'disable-zn');
+  const rows = HOOK_ROWS.filter((row) => row.kind !== 'disable-zn').map(map);
+  rows.push(uiRow);
+  rows.push(...bottom.map(map));
+  return rows;
+}
+
 export function hookOptionLabel(kind: HookKind, id: string): string {
   if (kind === 'mode') return t(`config.mode.${id}`);
   if (kind === 'debugdata') return t(`config.debugdata.${id}`);
+  if (kind === 'disable-zn') return t(`config.disableZn.${id}`);
   return ENGINE_LABELS[id] ?? id;
 }
 

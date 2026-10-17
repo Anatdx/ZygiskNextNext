@@ -37,6 +37,7 @@
     plt: 'pltHook',
     mode: 'mode',
     debugdata: 'debugdata',
+    'disable-zn': 'disableZn',
   };
 
   var config = {
@@ -44,6 +45,7 @@
     pltHook: { value: 'lsplt', options: ['lsplt', 'plti', 'bytehook', 'xhook'] },
     mode: { value: 'proc', options: ['auto', 'kernel', 'ptrace', 'proc', 'late'] },
     debugdata: { value: 'lzma', options: ['lzma', 'xz'] },
+    disableZn: { value: 'true', options: ['true', 'false'] },
   };
 
   var modules = [
@@ -106,7 +108,9 @@
         var key = CONFIG_KEYS[kind];
         var entry = key ? state.config[key] : null;
         if (!entry) {
-          throw new Error('usage: injector --ctl config-set <inline|plt|mode|debugdata> <value>');
+          throw new Error(
+            'usage: injector --ctl config-set <inline|plt|mode|debugdata|disable-zn> <value>',
+          );
         }
         if (entry.options.indexOf(value) < 0) {
           throw new Error('invalid ' + kind + ' value "' + value + '" for this device');

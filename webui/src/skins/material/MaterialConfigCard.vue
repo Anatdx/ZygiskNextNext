@@ -23,7 +23,8 @@ import { computed, ref } from 'vue';
 
 import type { HookConfig, HookKind } from '../../api/config';
 import { useAppActions } from '../../composables/app-actions';
-import { HOOK_ROWS, UI_ROW_LABEL_KEY, hookOptionLabel, uiModeLabel } from '../../config-model';
+import { configRows, UI_ROW_LABEL_KEY, hookOptionLabel, uiModeLabel } from '../../config-model';
+import type { HookRow } from '../../config-model';
 import { t } from '../../i18n';
 import { UI_MODES, isUiMode, setUiMode, uiMode } from '../../ui-mode';
 
@@ -48,7 +49,7 @@ const root = ref<HTMLElement | null>(null);
 const busy = ref(false);
 
 const rows = computed<ConfigRow[]>(() => {
-  const out: ConfigRow[] = HOOK_ROWS.map((row) => {
+  const make = (row: HookRow): ConfigRow => {
     const entry = props.config[row.field];
     return {
       kind: row.kind,
@@ -56,14 +57,14 @@ const rows = computed<ConfigRow[]>(() => {
       value: entry.value,
       options: entry.options.map((id) => ({ id, label: hookOptionLabel(row.kind, id) })),
     };
-  });
-  out.push({
+  };
+  const uiRow: ConfigRow = {
     kind: 'ui',
     label: t(UI_ROW_LABEL_KEY),
     value: uiMode.value,
     options: UI_MODES.map((id) => ({ id, label: uiModeLabel(id) })),
-  });
-  return out;
+  };
+  return configRows(make, uiRow);
 });
 
 function optionLabel(row: ConfigRow, id: string): string {
@@ -104,6 +105,11 @@ async function select(row: ConfigRow, value: string): Promise<void> {
     busy.value = false;
   }
 }
+
+function onSwitch(row: ConfigRow, event: Event): void {
+  const target = event.target as HTMLElement & { checked?: boolean };
+  void select(row, target.checked ? 'true' : 'false');
+}
 </script>
 
 <template>
@@ -111,25 +117,35 @@ async function select(row: ConfigRow, value: string): Promise<void> {
     <div slot="content" class="card-body">
       <div v-for="row in rows" :key="row.kind" class="config-row">
         <span class="config-label">{{ row.label }}</span>
-        <m3e-button
-          class="config-value"
-          size="extra-small"
-          variant="tonal"
-          @click="openMenu(row.kind, $event)"
-        >
-          <span>{{ optionLabel(row, row.value) }}</span>
-          <m3e-icon slot="trailing-icon" name="arrow_drop_down"></m3e-icon>
-        </m3e-button>
-        <m3e-menu :id="`znn-config-menu-${row.kind}`" position-x="before">
-          <m3e-menu-item-radio
-            v-for="option in row.options"
-            :key="option.id"
-            :checked="option.id === row.value"
-            @click="select(row, option.id)"
+        <m3e-switch
+          v-if="row.kind === 'disable-zn'"
+          class="config-switch"
+          :checked="row.value === 'true'"
+          :disabled="busy"
+          :aria-label="row.label"
+          @change="onSwitch(row, $event)"
+        />
+        <template v-else>
+          <m3e-button
+            class="config-value"
+            size="extra-small"
+            variant="tonal"
+            @click="openMenu(row.kind, $event)"
           >
-            {{ option.label }}
-          </m3e-menu-item-radio>
-        </m3e-menu>
+            <span>{{ optionLabel(row, row.value) }}</span>
+            <m3e-icon slot="trailing-icon" name="arrow_drop_down"></m3e-icon>
+          </m3e-button>
+          <m3e-menu :id="`znn-config-menu-${row.kind}`" position-x="before">
+            <m3e-menu-item-radio
+              v-for="option in row.options"
+              :key="option.id"
+              :checked="option.id === row.value"
+              @click="select(row, option.id)"
+            >
+              {{ option.label }}
+            </m3e-menu-item-radio>
+          </m3e-menu>
+        </template>
       </div>
     </div>
   </m3e-card>

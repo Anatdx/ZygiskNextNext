@@ -54,10 +54,10 @@ const STOP_ATTEMPTS: u32 = 80;
 /// How long `--ctl start` waits for the daemon it forked to be observable.
 const START_ATTEMPTS: u32 = 20;
 
-const USAGE: &str = "usage: injector --ctl <status|system|modules|config|config-set <inline|plt|mode|debugdata> <value>|start|restart|rescan|exit>";
+const USAGE: &str = "usage: injector --ctl <status|system|modules|config|config-set <inline|plt|mode|debugdata|disable-zn> <value>|apply-zn [wait]|start|restart|rescan|exit>";
 
 const CONFIG_SET_USAGE: &str =
-    "usage: injector --ctl config-set <inline|plt|mode|debugdata> <value>";
+    "usage: injector --ctl config-set <inline|plt|mode|debugdata|disable-zn> <value>";
 
 /// The command line of the injector: either a module directory to serve, or a
 /// control command answered on the spot.
@@ -79,7 +79,8 @@ pub fn command() -> ClapCommand {
                 .conflicts_with(MODULE_DIR_ARGUMENT)
                 .help(
                     "Control command: status, system, modules, config, \
-                       config-set <inline|plt|mode|debugdata> <value>, start, restart, rescan or exit.",
+                       config-set <inline|plt|mode|debugdata|disable-zn> <value>, \
+                       apply-zn [wait], start, restart, rescan or exit.",
                 ),
         )
 }
@@ -109,6 +110,7 @@ pub fn ctl_main(arguments: &[String]) -> i32 {
         "restart" => start_daemon(true),
         "config" => print_json(&config::effective().report()),
         "config-set" => config_set(arguments),
+        "apply-zn" => apply_zn(arguments),
         "status" => status(state_snapshot().as_ref()),
         "system" => system(state_snapshot().as_ref()),
         "modules" => modules(state_snapshot().as_ref()),
@@ -286,11 +288,36 @@ fn config_set(arguments: &[String]) -> i32 {
         return 1;
     }
 
+    if kind == "disable-zn" {
+        let disable = value == config::DISABLE_ZN_TRUE;
+        if !crate::zn::apply_now(disable) {
+            eprintln!(
+                "the setting was saved, but Zygisk Next could not be updated; see the module log"
+            );
+        }
+    }
+
     if let Some(pid) = daemon_pid() {
         let _ = process::kill(pid, signal::SIGHUP);
     }
 
     print_json(&updated.report())
+}
+
+fn apply_zn(arguments: &[String]) -> i32 {
+    if arguments.iter().any(|argument| argument != "wait") {
+        eprintln!("usage: injector --ctl apply-zn [wait]");
+        return 1;
+    }
+
+    let wait = arguments.iter().any(|argument| argument == "wait");
+    let disable = config::effective().disable_zn == config::DISABLE_ZN_TRUE;
+    let ok = if wait {
+        crate::zn::wait_and_apply(disable)
+    } else {
+        crate::zn::apply_now(disable)
+    };
+    if ok { 0 } else { 1 }
 }
 
 fn status(snapshot: Option<&StateSnapshot>) -> i32 {

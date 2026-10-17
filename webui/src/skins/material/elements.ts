@@ -28,6 +28,7 @@ import '@m3e/web/menu';
 import '@m3e/web/button';
 import '@m3e/web/list';
 import '@m3e/web/snackbar';
+import '@m3e/web/switch';
 
 import '@m3e/icons/outlined/arrow_drop_down';
 import '@m3e/icons/outlined/brightness_auto';

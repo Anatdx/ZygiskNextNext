@@ -29,9 +29,10 @@ export interface HookConfig {
   pltHook: HookEngineEntry;
   mode: HookEngineEntry;
   debugdata: HookEngineEntry;
+  disableZn: HookEngineEntry;
 }
 
-export type HookKind = 'inline' | 'plt' | 'mode' | 'debugdata';
+export type HookKind = 'inline' | 'plt' | 'mode' | 'debugdata' | 'disable-zn';
 
 function isHookEngineEntry(value: unknown): value is HookEngineEntry {
   if (typeof value !== 'object' || value === null) return false;
@@ -43,20 +44,40 @@ function isHookEngineEntry(value: unknown): value is HookEngineEntry {
   );
 }
 
-function isHookConfig(value: unknown): value is HookConfig {
+interface LegacyHookConfig {
+  inlineHook: HookEngineEntry;
+  pltHook: HookEngineEntry;
+  mode: HookEngineEntry;
+  debugdata: HookEngineEntry;
+  disableZn?: HookEngineEntry;
+}
+
+const DEFAULT_DISABLE_ZN: HookEngineEntry = {
+  value: 'true',
+  options: ['true', 'false'],
+};
+
+function isHookConfig(value: unknown): value is LegacyHookConfig {
   if (typeof value !== 'object' || value === null) return false;
   const config = value as Record<string, unknown>;
   return (
     isHookEngineEntry(config.inlineHook) &&
     isHookEngineEntry(config.pltHook) &&
     isHookEngineEntry(config.mode) &&
-    isHookEngineEntry(config.debugdata)
+    isHookEngineEntry(config.debugdata) &&
+    (config.disableZn === undefined || isHookEngineEntry(config.disableZn))
   );
 }
 
 function parseHookConfig(raw: unknown): HookConfig {
   if (!isHookConfig(raw)) throw new Error('unexpected config response');
-  return raw;
+  return {
+    inlineHook: raw.inlineHook,
+    pltHook: raw.pltHook,
+    mode: raw.mode,
+    debugdata: raw.debugdata,
+    disableZn: raw.disableZn ?? DEFAULT_DISABLE_ZN,
+  };
 }
 
 export async function getHookConfig(): Promise<HookConfig> {

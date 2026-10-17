@@ -18,12 +18,18 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { MiuixCard, MiuixDropdownPreference, showSnackbar } from 'miuix-vue';
+import {
+  MiuixCard,
+  MiuixDropdownPreference,
+  MiuixSwitchPreference,
+  showSnackbar,
+} from 'miuix-vue';
 import { computed, ref } from 'vue';
 
 import type { HookConfig, HookKind } from '../../api/config';
 import { useAppActions } from '../../composables/app-actions';
-import { HOOK_ROWS, UI_ROW_LABEL_KEY, hookOptionLabel, uiModeLabel } from '../../config-model';
+import { configRows, UI_ROW_LABEL_KEY, hookOptionLabel, uiModeLabel } from '../../config-model';
+import type { HookRow } from '../../config-model';
 import { t } from '../../i18n';
 import { UI_MODES, isUiMode, setUiMode, uiMode } from '../../ui-mode';
 
@@ -42,7 +48,7 @@ const actions = useAppActions();
 const busy = ref(false);
 
 const rows = computed<ConfigRow[]>(() => {
-  const out: ConfigRow[] = HOOK_ROWS.map((row) => {
+  const make = (row: HookRow): ConfigRow => {
     const entry = props.config[row.field];
     return {
       kind: row.kind,
@@ -51,15 +57,15 @@ const rows = computed<ConfigRow[]>(() => {
       ids: [...entry.options],
       labels: entry.options.map((id) => hookOptionLabel(row.kind, id)),
     };
-  });
-  out.push({
+  };
+  const uiRow: ConfigRow = {
     kind: 'ui',
     label: t(UI_ROW_LABEL_KEY),
     value: uiMode.value,
     ids: [...UI_MODES],
     labels: UI_MODES.map((id) => uiModeLabel(id)),
-  });
-  return out;
+  };
+  return configRows(make, uiRow);
 });
 
 function selectedIndex(row: ConfigRow): number {
@@ -67,8 +73,7 @@ function selectedIndex(row: ConfigRow): number {
   return position < 0 ? 0 : position;
 }
 
-async function select(row: ConfigRow, position: number): Promise<void> {
-  const value = row.ids[position];
+async function applyValue(row: ConfigRow, value: string): Promise<void> {
   if (!value || value === row.value) return;
   if (row.kind === 'ui') {
     if (isUiMode(value)) setUiMode(value);
@@ -86,18 +91,32 @@ async function select(row: ConfigRow, position: number): Promise<void> {
     busy.value = false;
   }
 }
+
+async function select(row: ConfigRow, position: number): Promise<void> {
+  const value = row.ids[position];
+  if (value) await applyValue(row, value);
+}
 </script>
 
 <template>
   <MiuixCard class="miuix-config-card">
-    <MiuixDropdownPreference
-      v-for="row in rows"
-      :key="row.kind"
-      class="miuix-config-row"
-      :title="row.label"
-      :items="row.labels"
-      :model-value="selectedIndex(row)"
-      @update:model-value="(position: number) => select(row, position)"
-    />
+    <template v-for="row in rows" :key="row.kind">
+      <MiuixSwitchPreference
+        v-if="row.kind === 'disable-zn'"
+        class="miuix-config-row"
+        :title="row.label"
+        :model-value="row.value === 'true'"
+        :disabled="busy"
+        @update:model-value="(value: boolean) => applyValue(row, value ? 'true' : 'false')"
+      />
+      <MiuixDropdownPreference
+        v-else
+        class="miuix-config-row"
+        :title="row.label"
+        :items="row.labels"
+        :model-value="selectedIndex(row)"
+        @update:model-value="(position: number) => select(row, position)"
+      />
+    </template>
   </MiuixCard>
 </template>

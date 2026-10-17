@@ -22,12 +22,14 @@ import { computed, ref } from 'vue';
 
 import type { HookConfig, HookKind } from '../../api/config';
 import { useAppActions } from '../../composables/app-actions';
-import { HOOK_ROWS, UI_ROW_LABEL_KEY, hookOptionLabel, uiModeLabel } from '../../config-model';
+import { configRows, UI_ROW_LABEL_KEY, hookOptionLabel, uiModeLabel } from '../../config-model';
+import type { HookRow } from '../../config-model';
 import { t } from '../../i18n';
 import { UI_MODES, isUiMode, setUiMode, uiMode } from '../../ui-mode';
 import ZnAlert from './ZnAlert.vue';
 import ZnCard from './ZnCard.vue';
 import ZnSelect from './ZnSelect.vue';
+import ZnSwitch from './ZnSwitch.vue';
 
 interface ConfigRow {
   kind: string;
@@ -44,7 +46,7 @@ const busy = ref(false);
 const failure = ref('');
 
 const rows = computed<ConfigRow[]>(() => {
-  const out: ConfigRow[] = HOOK_ROWS.map((row) => {
+  const make = (row: HookRow): ConfigRow => {
     const entry = props.config[row.field];
     return {
       kind: row.kind,
@@ -52,14 +54,14 @@ const rows = computed<ConfigRow[]>(() => {
       value: entry.value,
       options: [...entry.options],
     };
-  });
-  out.push({
+  };
+  const uiRow: ConfigRow = {
     kind: 'ui',
     label: t(UI_ROW_LABEL_KEY),
     value: uiMode.value,
     options: [...UI_MODES],
-  });
-  return out;
+  };
+  return configRows(make, uiRow);
 });
 
 function optionLabel(row: ConfigRow, id: string): string {
@@ -92,7 +94,15 @@ async function select(row: ConfigRow, value: string): Promise<void> {
     <div v-if="!props.error" class="zn-rows">
       <div v-for="row in rows" :key="row.kind" class="zn-row">
         <span class="zn-field-label">{{ row.label }}</span>
+        <ZnSwitch
+          v-if="row.kind === 'disable-zn'"
+          :model-value="row.value === 'true'"
+          :disabled="busy"
+          :label="row.label"
+          @update:model-value="(value: boolean) => select(row, value ? 'true' : 'false')"
+        />
         <ZnSelect
+          v-else
           :model-value="row.value"
           :options="row.options"
           :label="(id: string) => optionLabel(row, id)"

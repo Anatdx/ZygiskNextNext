@@ -44,6 +44,7 @@ mod sys;
 mod system;
 mod targets;
 mod trace;
+mod zn;
 
 fn main() {
     let matches = ctl::command().get_matches();
