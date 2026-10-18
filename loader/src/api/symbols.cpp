@@ -18,89 +18,99 @@
  */
 
 #include "api/api.h"
-
 #include "log.h"
 
 namespace znn::api {
 
 ZnSymbolResolver* newSymbolResolver(const char* path, void* base) {
-    if (!path) return nullptr;
+  if (!path) return nullptr;
 
-    auto* resolver = new ZnSymbolResolver();
-    resolver->image = new znn::ElfImage(path, reinterpret_cast<uintptr_t>(base));
-    if (!resolver->image->valid()) {
-        LOGW("newSymbolResolver %s: invalid", path);
-        delete resolver->image;
-        delete resolver;
-        return nullptr;
-    }
-    LOGI("newSymbolResolver %s -> %s base=%p", path, resolver->image->path().c_str(),
-         reinterpret_cast<void*>(resolver->image->base()));
-    return resolver;
+  auto* resolver = new ZnSymbolResolver();
+  resolver->image = new znn::ElfImage(path, reinterpret_cast<uintptr_t>(base));
+  if (!resolver->image->valid()) {
+    LOGW("newSymbolResolver %s: invalid", path);
+    delete resolver->image;
+    delete resolver;
+    return nullptr;
+  }
+  LOGI("newSymbolResolver %s -> %s base=%p", path,
+       resolver->image->path().c_str(),
+       reinterpret_cast<void*>(resolver->image->base()));
+  return resolver;
 }
 
 void freeSymbolResolver(ZnSymbolResolver* resolver) {
-    if (!resolver) return;
-    delete resolver->image;
-    delete resolver;
+  if (!resolver) return;
+  delete resolver->image;
+  delete resolver;
 }
 
 void* getBaseAddress(ZnSymbolResolver* resolver) {
-    if (!resolver) return nullptr;
-    return reinterpret_cast<void*>(resolver->image->base());
+  if (!resolver) return nullptr;
+  return reinterpret_cast<void*>(resolver->image->base());
 }
 
-void* symbolLookup(ZnSymbolResolver* resolver, const char* name, bool prefix, size_t* size) {
-    if (!resolver || !name) return nullptr;
+void* symbolLookup(ZnSymbolResolver* resolver, const char* name, bool prefix,
+                   size_t* size) {
+  if (!resolver || !name) return nullptr;
 
-    if (!prefix) {
-        const uintptr_t runtime = resolver->image->runtimeLookup(name, size);
-        if (runtime) {
-            LOGI("symbolLookup %s -> %p (runtime)", name, reinterpret_cast<void*>(runtime));
-            return reinterpret_cast<void*>(runtime);
-        }
+  if (!prefix) {
+    const uintptr_t runtime = resolver->image->runtimeLookup(name, size);
+    if (runtime) {
+      LOGI("symbolLookup %s -> %p (runtime)", name,
+           reinterpret_cast<void*>(runtime));
+      return reinterpret_cast<void*>(runtime);
     }
+  }
 
-    const znn::SymbolInfo* symbol = resolver->image->lookup(name, prefix);
-    if (!symbol) return nullptr;
-    if (size) *size = symbol->size;
-    LOGI("symbolLookup %s -> %p (elf)", name, reinterpret_cast<void*>(symbol->addr));
-    return reinterpret_cast<void*>(symbol->addr);
+  const znn::SymbolInfo* symbol = resolver->image->lookup(name, prefix);
+  if (!symbol) return nullptr;
+  if (size) *size = symbol->size;
+  LOGI("symbolLookup %s -> %p (elf)", name,
+       reinterpret_cast<void*>(symbol->addr));
+  return reinterpret_cast<void*>(symbol->addr);
 }
 
 void forEachSymbols(ZnSymbolResolver* resolver,
-                    bool (*callback)(const char* name, void* addr, size_t size, void* data),
+                    bool (*callback)(const char* name, void* addr, size_t size,
+                                     void* data),
                     void* data) {
-    if (!resolver || !callback) return;
-    resolver->image->forEach([&](const char* name, uintptr_t addr, size_t size) {
-        return callback(name, reinterpret_cast<void*>(addr), size, data);
-    });
+  if (!resolver || !callback) return;
+  resolver->image->forEach([&](const char* name, uintptr_t addr, size_t size) {
+    return callback(name, reinterpret_cast<void*>(addr), size, data);
+  });
 }
 
 ZnSymbolResolver* newSymbolResolverUnavailable(const char* path, void*) {
-    LOGE("Symbol Resolver API requires module API version >= 2 (newSymbolResolver %s)",
-         path ? path : "(null)");
-    return nullptr;
+  LOGE(
+      "Symbol Resolver API requires module API version >= 2 (newSymbolResolver "
+      "%s)",
+      path ? path : "(null)");
+  return nullptr;
 }
 
 void freeSymbolResolverUnavailable(ZnSymbolResolver*) {
-    LOGE("Symbol Resolver API requires module API version >= 2 (freeSymbolResolver)");
+  LOGE(
+      "Symbol Resolver API requires module API version >= 2 "
+      "(freeSymbolResolver)");
 }
 
 void* getBaseAddressUnavailable(ZnSymbolResolver*) {
-    LOGE("Symbol Resolver API requires module API version >= 2 (getBaseAddress)");
-    return nullptr;
+  LOGE("Symbol Resolver API requires module API version >= 2 (getBaseAddress)");
+  return nullptr;
 }
 
-void* symbolLookupUnavailable(ZnSymbolResolver*, const char* name, bool, size_t*) {
-    LOGE("Symbol Resolver API requires module API version >= 2 (symbolLookup %s)",
-         name ? name : "(null)");
-    return nullptr;
+void* symbolLookupUnavailable(ZnSymbolResolver*, const char* name, bool,
+                              size_t*) {
+  LOGE("Symbol Resolver API requires module API version >= 2 (symbolLookup %s)",
+       name ? name : "(null)");
+  return nullptr;
 }
 
-void forEachSymbolsUnavailable(ZnSymbolResolver*, bool (*)(const char*, void*, size_t, void*),
+void forEachSymbolsUnavailable(ZnSymbolResolver*,
+                               bool (*)(const char*, void*, size_t, void*),
                                void*) {
-    LOGE("Symbol Resolver API requires module API version >= 2 (forEachSymbols)");
+  LOGE("Symbol Resolver API requires module API version >= 2 (forEachSymbols)");
 }
 
-}  //namespace znn::api
+}  // namespace znn::api

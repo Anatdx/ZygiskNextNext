@@ -18,7 +18,6 @@
  */
 
 #include "hook/backend.h"
-
 #include "log.h"
 
 #ifdef __riscv
@@ -29,33 +28,33 @@ namespace znn::hook::backend {
 
 bool rv64hookHook(void* target, void* replacement, void** original) {
 #ifdef __riscv
-    {
-        rv64hook::ScopedRWXMemory rwx(target);
-        if (rv64hook::InlineHook(target, replacement, original) == nullptr) {
-            LOGE("inlineHook %p failed", target);
-            return false;
-        }
+  {
+    rv64hook::ScopedRWXMemory rwx(target);
+    if (rv64hook::InlineHook(target, replacement, original) == nullptr) {
+      LOGE("inlineHook %p failed", target);
+      return false;
     }
-    return true;
+  }
+  return true;
 #else
-    (void)target;
-    (void)replacement;
-    (void)original;
-    return false;
+  (void)target;
+  (void)replacement;
+  (void)original;
+  return false;
 #endif
 }
 
 bool rv64hookUnhook(void* target) {
 #ifdef __riscv
-    {
-        rv64hook::ScopedRWXMemory rwx(target);
-        if (!rv64hook::InlineUnhook(target)) return false;
-    }
-    return true;
+  {
+    rv64hook::ScopedRWXMemory rwx(target);
+    if (!rv64hook::InlineUnhook(target)) return false;
+  }
+  return true;
 #else
-    (void)target;
-    return false;
+  (void)target;
+  return false;
 #endif
 }
 
-}  //namespace znn::hook::backend
+}  // namespace znn::hook::backend

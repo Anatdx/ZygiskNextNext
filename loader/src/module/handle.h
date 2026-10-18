@@ -26,10 +26,10 @@
 namespace znn {
 
 struct ModuleHandle {
-    std::string lib_path;
-    uint32_t companion_nonce = 0;
-    int companion_listen_fd = -1;
-    int companion_channel = -1;
+  std::string lib_path;
+  uint32_t companion_nonce = 0;
+  int companion_listen_fd = -1;
+  int companion_channel = -1;
 };
 
-}  //namespace znn
+}  // namespace znn

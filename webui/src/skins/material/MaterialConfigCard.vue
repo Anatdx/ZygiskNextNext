@@ -18,15 +18,20 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { M3eSnackbar } from '@m3e/web/snackbar';
-import { computed, ref } from 'vue';
+import { M3eSnackbar } from "@m3e/web/snackbar";
+import { computed, ref } from "vue";
 
-import type { HookConfig, HookKind } from '../../api/config';
-import { useAppActions } from '../../composables/app-actions';
-import { configRows, UI_ROW_LABEL_KEY, hookOptionLabel, uiModeLabel } from '../../config-model';
-import type { HookRow } from '../../config-model';
-import { t } from '../../i18n';
-import { UI_MODES, isUiMode, setUiMode, uiMode } from '../../ui-mode';
+import type { HookConfig, HookKind } from "../../api/config";
+import { useAppActions } from "../../composables/app-actions";
+import {
+  configRows,
+  UI_ROW_LABEL_KEY,
+  hookOptionLabel,
+  uiModeLabel,
+} from "../../config-model";
+import type { HookRow } from "../../config-model";
+import { t } from "../../i18n";
+import { UI_MODES, isUiMode, setUiMode, uiMode } from "../../ui-mode";
 
 interface ConfigOption {
   id: string;
@@ -55,11 +60,14 @@ const rows = computed<ConfigRow[]>(() => {
       kind: row.kind,
       label: t(row.labelKey),
       value: entry.value,
-      options: entry.options.map((id) => ({ id, label: hookOptionLabel(row.kind, id) })),
+      options: entry.options.map((id) => ({
+        id,
+        label: hookOptionLabel(row.kind, id),
+      })),
     };
   };
   const uiRow: ConfigRow = {
-    kind: 'ui',
+    kind: "ui",
     label: t(UI_ROW_LABEL_KEY),
     value: uiMode.value,
     options: UI_MODES.map((id) => ({ id, label: uiModeLabel(id) })),
@@ -81,7 +89,7 @@ function openMenu(kind: string, event: MouseEvent): void {
   const rect = button.getBoundingClientRect();
   const viewport = document.documentElement.clientWidth;
   menu.style.setProperty(
-    '--znn-menu-inline-end',
+    "--znn-menu-inline-end",
     `${Math.max(8, Math.round(viewport - rect.right))}px`,
   );
   void menu.toggle(button);
@@ -89,7 +97,7 @@ function openMenu(kind: string, event: MouseEvent): void {
 
 async function select(row: ConfigRow, value: string): Promise<void> {
   if (value === row.value) return;
-  if (row.kind === 'ui') {
+  if (row.kind === "ui") {
     if (isUiMode(value)) setUiMode(value);
     return;
   }
@@ -97,10 +105,10 @@ async function select(row: ConfigRow, value: string): Promise<void> {
   busy.value = true;
   try {
     await actions.applyHookConfig(row.kind as HookKind, value);
-    M3eSnackbar.open(t('config.saved'));
+    M3eSnackbar.open(t("config.saved"));
   } catch (e) {
-    console.warn('[znn] config-set:', e);
-    M3eSnackbar.open(t('config.saveFailed'));
+    console.warn("[znn] config-set:", e);
+    M3eSnackbar.open(t("config.saveFailed"));
   } finally {
     busy.value = false;
   }
@@ -108,7 +116,7 @@ async function select(row: ConfigRow, value: string): Promise<void> {
 
 function onSwitch(row: ConfigRow, event: Event): void {
   const target = event.target as HTMLElement & { checked?: boolean };
-  void select(row, target.checked ? 'true' : 'false');
+  void select(row, target.checked ? "true" : "false");
 }
 </script>
 

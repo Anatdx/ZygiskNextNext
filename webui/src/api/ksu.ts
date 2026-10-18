@@ -17,24 +17,32 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { exec, moduleInfo } from 'kernelsu';
-import { MODULE_ID } from '../app-info';
+import { exec, moduleInfo } from "kernelsu";
+import { MODULE_ID } from "../app-info";
 
 export function isKsuAvailable(): boolean {
-  return typeof (window as unknown as { ksu?: unknown }).ksu !== 'undefined';
+  return typeof (window as unknown as { ksu?: unknown }).ksu !== "undefined";
 }
 
-export async function execJson<T>(command: string, timeoutMs = 5000): Promise<T> {
+export async function execJson<T>(
+  command: string,
+  timeoutMs = 5000,
+): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     const result = await Promise.race([
       exec(command),
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error(`command timed out: ${command}`)), timeoutMs);
+        timer = setTimeout(
+          () => reject(new Error(`command timed out: ${command}`)),
+          timeoutMs,
+        );
       }),
     ]);
     if (result.errno !== 0) {
-      throw new Error(`command failed (errno ${result.errno}): ${command}\n${result.stderr}`);
+      throw new Error(
+        `command failed (errno ${result.errno}): ${command}\n${result.stderr}`,
+      );
     }
     return JSON.parse(result.stdout.trim()) as T;
   } finally {
@@ -47,11 +55,14 @@ export async function execJson<T>(command: string, timeoutMs = 5000): Promise<T>
 export function getModuleDir(): string {
   try {
     const info = JSON.parse(moduleInfo()) as { moduleDir?: string };
-    if (info && typeof info.moduleDir === 'string' && info.moduleDir.length > 0) {
+    if (
+      info &&
+      typeof info.moduleDir === "string" &&
+      info.moduleDir.length > 0
+    ) {
       return info.moduleDir;
     }
-  } catch {
-  }
+  } catch {}
   return `/data/adb/modules/${MODULE_ID}`;
 }
 

@@ -17,12 +17,11 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-#include "hook/backend.h"
-
-#include "log.h"
-
 #include <map>
 #include <mutex>
+
+#include "hook/backend.h"
+#include "log.h"
 
 #if defined(__aarch64__) || defined(__arm__)
 #include <shadowhook.h>
@@ -39,51 +38,53 @@ int g_init_result = -1;
 std::mutex g_mutex;
 std::map<uintptr_t, void*> g_stubs;
 
-}  //namespace
+}  // namespace
 
 bool shadowhookInit() {
-    std::call_once(g_init_once, [] {
-        g_init_result = shadowhook_init(SHADOWHOOK_MODE_UNIQUE, false);
-    });
-    if (g_init_result != 0) {
-        LOGE("shadowhook_init failed: %s", shadowhook_to_errmsg(shadowhook_get_init_errno()));
-        return false;
-    }
-    LOGI("shadowhook engine ready (mode: unique)");
-    return true;
+  std::call_once(g_init_once, [] {
+    g_init_result = shadowhook_init(SHADOWHOOK_MODE_UNIQUE, false);
+  });
+  if (g_init_result != 0) {
+    LOGE("shadowhook_init failed: %s",
+         shadowhook_to_errmsg(shadowhook_get_init_errno()));
+    return false;
+  }
+  LOGI("shadowhook engine ready (mode: unique)");
+  return true;
 }
 
 bool shadowhookHook(void* target, void* replacement, void** original) {
-    if (!shadowhookInit()) return false;
-    void* stub = shadowhook_hook_func_addr(target, replacement, original);
-    if (!stub) {
-        LOGE("inlineHook %p failed: %s", target, shadowhook_to_errmsg(shadowhook_get_errno()));
-        return false;
-    }
-    std::lock_guard<std::mutex> lk(g_mutex);
-    g_stubs[reinterpret_cast<uintptr_t>(target)] = stub;
-    return true;
+  if (!shadowhookInit()) return false;
+  void* stub = shadowhook_hook_func_addr(target, replacement, original);
+  if (!stub) {
+    LOGE("inlineHook %p failed: %s", target,
+         shadowhook_to_errmsg(shadowhook_get_errno()));
+    return false;
+  }
+  std::lock_guard<std::mutex> lk(g_mutex);
+  g_stubs[reinterpret_cast<uintptr_t>(target)] = stub;
+  return true;
 }
 
 bool shadowhookUnhook(void* target) {
-    if (!shadowhookInit()) return false;
-    void* stub = nullptr;
-    {
-        std::lock_guard<std::mutex> lk(g_mutex);
-        auto it = g_stubs.find(reinterpret_cast<uintptr_t>(target));
-        if (it != g_stubs.end()) {
-            stub = it->second;
-        }
+  if (!shadowhookInit()) return false;
+  void* stub = nullptr;
+  {
+    std::lock_guard<std::mutex> lk(g_mutex);
+    auto it = g_stubs.find(reinterpret_cast<uintptr_t>(target));
+    if (it != g_stubs.end()) {
+      stub = it->second;
     }
-    if (!stub || shadowhook_unhook(stub) != 0) {
-        LOGE("inlineUnhook %p failed", target);
-        return false;
-    }
-    {
-        std::lock_guard<std::mutex> lk(g_mutex);
-        g_stubs.erase(reinterpret_cast<uintptr_t>(target));
-    }
-    return true;
+  }
+  if (!stub || shadowhook_unhook(stub) != 0) {
+    LOGE("inlineUnhook %p failed", target);
+    return false;
+  }
+  {
+    std::lock_guard<std::mutex> lk(g_mutex);
+    g_stubs.erase(reinterpret_cast<uintptr_t>(target));
+  }
+  return true;
 }
 
 #else
@@ -91,17 +92,17 @@ bool shadowhookUnhook(void* target) {
 bool shadowhookInit() { return false; }
 
 bool shadowhookHook(void* target, void* replacement, void** original) {
-    (void)target;
-    (void)replacement;
-    (void)original;
-    return false;
+  (void)target;
+  (void)replacement;
+  (void)original;
+  return false;
 }
 
 bool shadowhookUnhook(void* target) {
-    (void)target;
-    return false;
+  (void)target;
+  return false;
 }
 
 #endif
 
-}  //namespace znn::hook::backend
+}  // namespace znn::hook::backend

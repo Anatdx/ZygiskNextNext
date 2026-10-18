@@ -25,4 +25,4 @@ namespace znn::config {
 
 void resolveDebugDataBackend(const std::string& name);
 
-}  //namespace znn::config
+}  // namespace znn::config

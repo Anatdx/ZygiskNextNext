@@ -27,4 +27,4 @@ export {
   Refresh,
   Theme,
   Translate,
-} from 'miuix-vue/icons';
+} from "miuix-vue/icons";

@@ -18,14 +18,14 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { t } from '../../i18n';
+import { t } from "../../i18n";
 </script>
 
 <template>
   <m3e-card class="empty-card" variant="filled">
     <div slot="content" class="empty-body">
       <m3e-icon name="info"></m3e-icon>
-      <span>{{ t('empty.title') }}</span>
+      <span>{{ t("empty.title") }}</span>
     </div>
   </m3e-card>
 </template>

@@ -30,7 +30,7 @@ int registerModule(const void* module);
 
 const ZygiskNextRuntime* runtime();
 
-//child, after selinux setcontext
+// child, after selinux setcontext
 void deliverAppSpecialized(const char* pkg_name, const char* se_info);
 
-}  //namespace znn::hyos
+}  // namespace znn::hyos

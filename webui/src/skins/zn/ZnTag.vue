@@ -18,19 +18,19 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { computed } from 'vue';
+import { computed } from "vue";
 
-import ZnIcon from './ZnIcon.vue';
-import type { IconName } from './icons';
+import ZnIcon from "./ZnIcon.vue";
+import type { IconName } from "./icons";
 
 const props = withDefaults(
-  defineProps<{ tone?: 'ok' | 'info' | 'warn'; small?: boolean }>(),
-  { tone: 'ok', small: false },
+  defineProps<{ tone?: "ok" | "info" | "warn"; small?: boolean }>(),
+  { tone: "ok", small: false },
 );
 
-const TONE_ICONS: Partial<Record<'ok' | 'info' | 'warn', IconName>> = {
-  ok: 'sentimentVerySatisfied',
-  warn: 'warning',
+const TONE_ICONS: Partial<Record<"ok" | "info" | "warn", IconName>> = {
+  ok: "sentimentVerySatisfied",
+  warn: "warning",
 };
 
 const icon = computed<IconName | null>(() => TONE_ICONS[props.tone] ?? null);
@@ -41,7 +41,10 @@ const iconSize = computed(() => (props.small ? 14 : 20));
 <template>
   <span
     class="zn-tag"
-    :class="[`is-${props.tone}`, { 'is-small': props.small, 'is-iconless': !icon }]"
+    :class="[
+      `is-${props.tone}`,
+      { 'is-small': props.small, 'is-iconless': !icon },
+    ]"
   >
     <ZnIcon v-if="icon" :name="icon" :size="iconSize" />
     <slot />

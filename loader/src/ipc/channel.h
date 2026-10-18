@@ -37,4 +37,4 @@ bool makePeerPair(int* out_module_fd, int* out_helper_fd);
 bool sendFrame(int fd, uint8_t command, int payload_fd);
 bool recvFrame(int fd, uint8_t* command, int* out_fd);
 
-}  //namespace znn::ipc
+}  // namespace znn::ipc

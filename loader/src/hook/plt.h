@@ -21,6 +21,7 @@
 
 namespace znn::hook {
 
-bool pltHook(void* base, const char* symbol, void* replacement, void** original);
+bool pltHook(void* base, const char* symbol, void* replacement,
+             void** original);
 
-}  //namespace znn::hook
+}  // namespace znn::hook

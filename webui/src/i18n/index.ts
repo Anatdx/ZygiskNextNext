@@ -17,25 +17,25 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { computed, ref, type ComputedRef } from 'vue';
+import { computed, ref, type ComputedRef } from "vue";
 
-import { en, type Dictionary } from './en';
-import { zhCN } from './zh-CN';
+import { en, type Dictionary } from "./en";
+import { zhCN } from "./zh-CN";
 
-export type Locale = 'zh-CN' | 'en';
+export type Locale = "zh-CN" | "en";
 
-export const LOCALE_STORAGE_KEY = 'znn_locale';
+export const LOCALE_STORAGE_KEY = "znn_locale";
 
-export const LOCALES: Locale[] = ['zh-CN', 'en'];
+export const LOCALES: Locale[] = ["zh-CN", "en"];
 
 const dictionaries: Record<Locale, Dictionary> = {
-  'zh-CN': zhCN,
+  "zh-CN": zhCN,
   en,
 };
 
 export const LOCALE_LABELS: Record<Locale, string> = {
-  'zh-CN': '简体中文',
-  en: 'English',
+  "zh-CN": "简体中文",
+  en: "English",
 };
 
 const currentRef = ref<Locale>(detectLocale());
@@ -45,11 +45,10 @@ export const locale: ComputedRef<Locale> = computed(() => currentRef.value);
 function detectLocale(): Locale {
   try {
     const saved = localStorage.getItem(LOCALE_STORAGE_KEY);
-    if (saved === 'zh-CN' || saved === 'en') return saved;
-  } catch {
-  }
-  const lang = (navigator.language || 'en').toLowerCase();
-  return lang.startsWith('zh') ? 'zh-CN' : 'en';
+    if (saved === "zh-CN" || saved === "en") return saved;
+  } catch {}
+  const lang = (navigator.language || "en").toLowerCase();
+  return lang.startsWith("zh") ? "zh-CN" : "en";
 }
 
 export function setLocale(next: Locale): void {
@@ -57,12 +56,14 @@ export function setLocale(next: Locale): void {
   currentRef.value = next;
   try {
     localStorage.setItem(LOCALE_STORAGE_KEY, next);
-  } catch {
-  }
+  } catch {}
   applyLocale();
 }
 
-export function t(key: string, params?: Record<string, string | number>): string {
+export function t(
+  key: string,
+  params?: Record<string, string | number>,
+): string {
   const strings = dictionaries[currentRef.value] as Record<string, string>;
   let text: string = strings[key] ?? (en as Record<string, string>)[key] ?? key;
   if (params) {

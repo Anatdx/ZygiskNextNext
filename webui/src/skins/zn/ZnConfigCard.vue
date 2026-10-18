@@ -18,18 +18,23 @@
  * Copyright (C) 2026 VeryBaaad <verybaad@outlook.com>
  */
 
-import { computed, ref } from 'vue';
+import { computed, ref } from "vue";
 
-import type { HookConfig, HookKind } from '../../api/config';
-import { useAppActions } from '../../composables/app-actions';
-import { configRows, UI_ROW_LABEL_KEY, hookOptionLabel, uiModeLabel } from '../../config-model';
-import type { HookRow } from '../../config-model';
-import { t } from '../../i18n';
-import { UI_MODES, isUiMode, setUiMode, uiMode } from '../../ui-mode';
-import ZnAlert from './ZnAlert.vue';
-import ZnCard from './ZnCard.vue';
-import ZnSelect from './ZnSelect.vue';
-import ZnSwitch from './ZnSwitch.vue';
+import type { HookConfig, HookKind } from "../../api/config";
+import { useAppActions } from "../../composables/app-actions";
+import {
+  configRows,
+  UI_ROW_LABEL_KEY,
+  hookOptionLabel,
+  uiModeLabel,
+} from "../../config-model";
+import type { HookRow } from "../../config-model";
+import { t } from "../../i18n";
+import { UI_MODES, isUiMode, setUiMode, uiMode } from "../../ui-mode";
+import ZnAlert from "./ZnAlert.vue";
+import ZnCard from "./ZnCard.vue";
+import ZnSelect from "./ZnSelect.vue";
+import ZnSwitch from "./ZnSwitch.vue";
 
 interface ConfigRow {
   kind: string;
@@ -43,7 +48,7 @@ const props = defineProps<{ config: HookConfig; error?: boolean }>();
 const actions = useAppActions();
 
 const busy = ref(false);
-const failure = ref('');
+const failure = ref("");
 
 const rows = computed<ConfigRow[]>(() => {
   const make = (row: HookRow): ConfigRow => {
@@ -56,7 +61,7 @@ const rows = computed<ConfigRow[]>(() => {
     };
   };
   const uiRow: ConfigRow = {
-    kind: 'ui',
+    kind: "ui",
     label: t(UI_ROW_LABEL_KEY),
     value: uiMode.value,
     options: [...UI_MODES],
@@ -65,14 +70,14 @@ const rows = computed<ConfigRow[]>(() => {
 });
 
 function optionLabel(row: ConfigRow, id: string): string {
-  if (row.kind === 'ui') return uiModeLabel(id);
+  if (row.kind === "ui") return uiModeLabel(id);
   return hookOptionLabel(row.kind as HookKind, id);
 }
 
 async function select(row: ConfigRow, value: string): Promise<void> {
-  failure.value = '';
+  failure.value = "";
   if (value === row.value) return;
-  if (row.kind === 'ui') {
+  if (row.kind === "ui") {
     if (isUiMode(value)) setUiMode(value);
     return;
   }
@@ -81,8 +86,8 @@ async function select(row: ConfigRow, value: string): Promise<void> {
   try {
     await actions.applyHookConfig(row.kind as HookKind, value);
   } catch (e) {
-    console.warn('[znn] config-set:', e);
-    failure.value = t('config.saveFailed');
+    console.warn("[znn] config-set:", e);
+    failure.value = t("config.saveFailed");
   } finally {
     busy.value = false;
   }
@@ -99,7 +104,9 @@ async function select(row: ConfigRow, value: string): Promise<void> {
           :model-value="row.value === 'true'"
           :disabled="busy"
           :label="row.label"
-          @update:model-value="(value: boolean) => select(row, value ? 'true' : 'false')"
+          @update:model-value="
+            (value: boolean) => select(row, value ? 'true' : 'false')
+          "
         />
         <ZnSelect
           v-else

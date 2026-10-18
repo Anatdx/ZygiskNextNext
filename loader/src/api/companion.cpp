@@ -17,47 +17,46 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-#include "api/api.h"
+#include <unistd.h>
 
+#include "api/api.h"
 #include "ipc/channel.h"
 #include "log.h"
 #include "module/handle.h"
 
-#include <unistd.h>
-
 namespace znn::api {
 
 int connectCompanion(void* handle) {
-    auto* h = static_cast<ModuleHandle*>(handle);
-    if (!h) return -1;
+  auto* h = static_cast<ModuleHandle*>(handle);
+  if (!h) return -1;
 
-    if (h->companion_channel < 0) {
-        if (h->companion_listen_fd < 0) return -1;
-        h->companion_channel =
-            ipc::acceptChannel(h->companion_listen_fd, h->companion_nonce,
-                               ipc::kChannelAcceptTimeoutMs);
-        if (h->companion_channel >= 0) {
-            close(h->companion_listen_fd);
-            h->companion_listen_fd = -1;
-        }
+  if (h->companion_channel < 0) {
+    if (h->companion_listen_fd < 0) return -1;
+    h->companion_channel =
+        ipc::acceptChannel(h->companion_listen_fd, h->companion_nonce,
+                           ipc::kChannelAcceptTimeoutMs);
+    if (h->companion_channel >= 0) {
+      close(h->companion_listen_fd);
+      h->companion_listen_fd = -1;
     }
-    if (h->companion_channel < 0) return -1;
+  }
+  if (h->companion_channel < 0) return -1;
 
-    int module_fd = -1;
-    int helper_fd = -1;
-    if (!ipc::makePeerPair(&module_fd, &helper_fd)) return -1;
-    if (!ipc::sendFrame(h->companion_channel, ipc::kChannelConnect, helper_fd)) {
-        close(module_fd);
-        close(helper_fd);
-        return -1;
-    }
+  int module_fd = -1;
+  int helper_fd = -1;
+  if (!ipc::makePeerPair(&module_fd, &helper_fd)) return -1;
+  if (!ipc::sendFrame(h->companion_channel, ipc::kChannelConnect, helper_fd)) {
+    close(module_fd);
     close(helper_fd);
-    return module_fd;
+    return -1;
+  }
+  close(helper_fd);
+  return module_fd;
 }
 
 int connectCompanionUnavailable(void*) {
-    LOGE("Companion API requires module API version >= 3 (connectCompanion)");
-    return -1;
+  LOGE("Companion API requires module API version >= 3 (connectCompanion)");
+  return -1;
 }
 
-}  //namespace znn::api
+}  // namespace znn::api

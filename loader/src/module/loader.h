@@ -25,4 +25,4 @@ namespace znn::module {
 
 void loadAll(const Plan& plan);
 
-}  //namespace znn::module
+}  // namespace znn::module

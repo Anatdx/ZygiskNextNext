@@ -23,15 +23,20 @@ import {
   MiuixDropdownPreference,
   MiuixSwitchPreference,
   showSnackbar,
-} from 'miuix-vue';
-import { computed, ref } from 'vue';
+} from "miuix-vue";
+import { computed, ref } from "vue";
 
-import type { HookConfig, HookKind } from '../../api/config';
-import { useAppActions } from '../../composables/app-actions';
-import { configRows, UI_ROW_LABEL_KEY, hookOptionLabel, uiModeLabel } from '../../config-model';
-import type { HookRow } from '../../config-model';
-import { t } from '../../i18n';
-import { UI_MODES, isUiMode, setUiMode, uiMode } from '../../ui-mode';
+import type { HookConfig, HookKind } from "../../api/config";
+import { useAppActions } from "../../composables/app-actions";
+import {
+  configRows,
+  UI_ROW_LABEL_KEY,
+  hookOptionLabel,
+  uiModeLabel,
+} from "../../config-model";
+import type { HookRow } from "../../config-model";
+import { t } from "../../i18n";
+import { UI_MODES, isUiMode, setUiMode, uiMode } from "../../ui-mode";
 
 interface ConfigRow {
   kind: string;
@@ -59,7 +64,7 @@ const rows = computed<ConfigRow[]>(() => {
     };
   };
   const uiRow: ConfigRow = {
-    kind: 'ui',
+    kind: "ui",
     label: t(UI_ROW_LABEL_KEY),
     value: uiMode.value,
     ids: [...UI_MODES],
@@ -75,7 +80,7 @@ function selectedIndex(row: ConfigRow): number {
 
 async function applyValue(row: ConfigRow, value: string): Promise<void> {
   if (!value || value === row.value) return;
-  if (row.kind === 'ui') {
+  if (row.kind === "ui") {
     if (isUiMode(value)) setUiMode(value);
     return;
   }
@@ -83,10 +88,10 @@ async function applyValue(row: ConfigRow, value: string): Promise<void> {
   busy.value = true;
   try {
     await actions.applyHookConfig(row.kind as HookKind, value);
-    void showSnackbar({ message: t('config.saved'), duration: 'short' });
+    void showSnackbar({ message: t("config.saved"), duration: "short" });
   } catch (e) {
-    console.warn('[znn] config-set:', e);
-    void showSnackbar({ message: t('config.saveFailed'), duration: 'long' });
+    console.warn("[znn] config-set:", e);
+    void showSnackbar({ message: t("config.saveFailed"), duration: "long" });
   } finally {
     busy.value = false;
   }
@@ -107,7 +112,9 @@ async function select(row: ConfigRow, position: number): Promise<void> {
         :title="row.label"
         :model-value="row.value === 'true'"
         :disabled="busy"
-        @update:model-value="(value: boolean) => applyValue(row, value ? 'true' : 'false')"
+        @update:model-value="
+          (value: boolean) => applyValue(row, value ? 'true' : 'false')
+        "
       />
       <MiuixDropdownPreference
         v-else

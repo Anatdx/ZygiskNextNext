@@ -18,10 +18,10 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { computed, useTemplateRef } from 'vue';
+import { computed, useTemplateRef } from "vue";
 
-import ZnIcon from './ZnIcon.vue';
-import { usePopover } from './use-popover';
+import ZnIcon from "./ZnIcon.vue";
+import { usePopover } from "./use-popover";
 
 const props = defineProps<{
   modelValue: string;
@@ -32,7 +32,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{ select: [id: string] }>();
 
-const root = useTemplateRef<HTMLElement>('root');
+const root = useTemplateRef<HTMLElement>("root");
 
 const { open, above, toggle, close } = usePopover(() => root.value);
 
@@ -41,7 +41,7 @@ const currentLabel = computed(() => props.label(props.modelValue));
 function choose(id: string): void {
   close();
   if (id === props.modelValue) return;
-  emit('select', id);
+  emit("select", id);
 }
 </script>
 
@@ -59,7 +59,12 @@ function choose(id: string): void {
       <ZnIcon class="zn-select-arrow" name="chevronDown" :size="16" />
     </button>
 
-    <div v-if="open" class="zn-menu" :class="{ 'is-above': above }" role="listbox">
+    <div
+      v-if="open"
+      class="zn-menu"
+      :class="{ 'is-above': above }"
+      role="listbox"
+    >
       <button
         v-for="id in props.options"
         :key="id"

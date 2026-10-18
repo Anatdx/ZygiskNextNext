@@ -17,15 +17,15 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { computed, ref, watch, type ComputedRef } from 'vue';
+import { computed, ref, watch, type ComputedRef } from "vue";
 
-export type UiMode = 'material' | 'miuix' | 'zn';
+export type UiMode = "material" | "miuix" | "zn";
 
-export const UI_MODE_STORAGE_KEY = 'znn_ui';
+export const UI_MODE_STORAGE_KEY = "znn_ui";
 
-export const DEFAULT_UI_MODE: UiMode = 'material';
+export const DEFAULT_UI_MODE: UiMode = "material";
 
-export const UI_MODES: UiMode[] = ['material', 'miuix', 'zn'];
+export const UI_MODES: UiMode[] = ["material", "miuix", "zn"];
 
 const modeRef = ref<UiMode>(detectUiMode());
 
@@ -35,8 +35,7 @@ function detectUiMode(): UiMode {
   try {
     const saved = localStorage.getItem(UI_MODE_STORAGE_KEY);
     if (saved && isUiMode(saved)) return saved;
-  } catch {
-  }
+  } catch {}
   return DEFAULT_UI_MODE;
 }
 
@@ -49,8 +48,7 @@ export function setUiMode(next: UiMode): void {
   modeRef.value = next;
   try {
     localStorage.setItem(UI_MODE_STORAGE_KEY, next);
-  } catch {
-  }
+  } catch {}
 }
 
 function apply(): void {

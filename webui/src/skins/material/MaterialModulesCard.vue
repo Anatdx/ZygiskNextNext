@@ -18,8 +18,8 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import type { ZnnModule } from '../../api/modules';
-import { t } from '../../i18n';
+import type { ZnnModule } from "../../api/modules";
+import { t } from "../../i18n";
 
 const props = defineProps<{ modules: ZnnModule[] }>();
 
@@ -27,7 +27,7 @@ const props = defineProps<{ modules: ZnnModule[] }>();
 const expanded = new Set<string>();
 
 const basename = (value: string): string => {
-  const cut = value.lastIndexOf('/');
+  const cut = value.lastIndexOf("/");
   return cut >= 0 ? value.slice(cut + 1) : value;
 };
 </script>
@@ -37,7 +37,7 @@ const basename = (value: string): string => {
     <div slot="content" class="card-body">
       <m3e-list class="modules-list">
         <div v-if="props.modules.length === 0" class="modules-empty">
-          {{ t('modules.noModules') }}
+          {{ t("modules.noModules") }}
         </div>
         <m3e-expandable-list-item
           v-for="module in props.modules"
@@ -54,22 +54,28 @@ const basename = (value: string): string => {
               class="module-count"
               :class="{ 'has-failed': (module.failed ?? []).length > 0 }"
             >
-              {{ t('modules.processes', { n: module.processes.length }) }}
+              {{ t("modules.processes", { n: module.processes.length }) }}
               <template v-if="(module.failed ?? []).length > 0">
-                · {{ t('modules.failed', { n: (module.failed ?? []).length }) }}
+                · {{ t("modules.failed", { n: (module.failed ?? []).length }) }}
               </template>
             </span>
           </span>
           <div slot="items" class="proc-list">
             <div v-if="module.processes.length === 0" class="proc-empty">—</div>
-            <div v-for="process in module.processes" :key="process.pid" class="proc-row">
+            <div
+              v-for="process in module.processes"
+              :key="process.pid"
+              class="proc-row"
+            >
               <span class="proc-name" :title="basename(process.name)">
                 {{ basename(process.name) }}
               </span>
               <span class="proc-pid">pid={{ process.pid }}</span>
             </div>
             <template v-if="(module.failed ?? []).length > 0">
-              <div class="proc-failed-title">{{ t('modules.failedTitle') }}</div>
+              <div class="proc-failed-title">
+                {{ t("modules.failedTitle") }}
+              </div>
               <div
                 v-for="failure in module.failed ?? []"
                 :key="`${failure.name}-${failure.reason}`"

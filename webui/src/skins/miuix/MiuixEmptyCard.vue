@@ -18,10 +18,10 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { MiuixBasicComponent, MiuixCard, MiuixIcon } from 'miuix-vue';
+import { MiuixBasicComponent, MiuixCard, MiuixIcon } from "miuix-vue";
 
-import { t } from '../../i18n';
-import { Info } from './icons';
+import { t } from "../../i18n";
+import { Info } from "./icons";
 </script>
 
 <template>

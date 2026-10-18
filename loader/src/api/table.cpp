@@ -22,50 +22,62 @@
 namespace znn::api {
 namespace {
 
-//v1: hook only, v2: + symbol resolver, v3: + companion, v4: + runtime
+// v1: hook only, v2: + symbol resolver, v3: + companion, v4: + runtime
 
 const ZygiskNextAPI kApiV1 = {
-    pltHook,                      inlineHook, inlineUnhook,
-    newSymbolResolverUnavailable, freeSymbolResolverUnavailable,
-    getBaseAddressUnavailable,    symbolLookupUnavailable,
+    pltHook,
+    inlineHook,
+    inlineUnhook,
+    newSymbolResolverUnavailable,
+    freeSymbolResolverUnavailable,
+    getBaseAddressUnavailable,
+    symbolLookupUnavailable,
     forEachSymbolsUnavailable,
     connectCompanionUnavailable,
     getRuntimeUnavailable,
 };
 
 const ZygiskNextAPI kApiV2 = {
-    pltHook,                      inlineHook, inlineUnhook,
-    newSymbolResolver,            freeSymbolResolver,
-    getBaseAddress,               symbolLookup,
+    pltHook,
+    inlineHook,
+    inlineUnhook,
+    newSymbolResolver,
+    freeSymbolResolver,
+    getBaseAddress,
+    symbolLookup,
     forEachSymbols,
     connectCompanionUnavailable,
     getRuntimeUnavailable,
 };
 
 const ZygiskNextAPI kApiV3 = {
-    pltHook,           inlineHook,   inlineUnhook,
-    newSymbolResolver, freeSymbolResolver, getBaseAddress,
-    symbolLookup,      forEachSymbols,
+    pltHook,
+    inlineHook,
+    inlineUnhook,
+    newSymbolResolver,
+    freeSymbolResolver,
+    getBaseAddress,
+    symbolLookup,
+    forEachSymbols,
     connectCompanion,
     getRuntimeUnavailable,
 };
 
 const ZygiskNextAPI kApiV4 = {
-    pltHook,           inlineHook,   inlineUnhook,
+    pltHook,           inlineHook,         inlineUnhook,
     newSymbolResolver, freeSymbolResolver, getBaseAddress,
-    symbolLookup,      forEachSymbols,
-    connectCompanion,
+    symbolLookup,      forEachSymbols,     connectCompanion,
     getRuntime,
 };
 
-}  //namespace
+}  // namespace
 
 const ZygiskNextAPI* apiForVersion(int target_api_version) {
-    if (target_api_version >= 4) return &kApiV4;
-    if (target_api_version == 3) return &kApiV3;
-    if (target_api_version == 2) return &kApiV2;
-    if (target_api_version == 1) return &kApiV1;
-    return &kApiV4;
+  if (target_api_version >= 4) return &kApiV4;
+  if (target_api_version == 3) return &kApiV3;
+  if (target_api_version == 2) return &kApiV2;
+  if (target_api_version == 1) return &kApiV1;
+  return &kApiV4;
 }
 
-}  //namespace znn::api
+}  // namespace znn::api

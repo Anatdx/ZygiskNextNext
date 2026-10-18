@@ -18,22 +18,22 @@
  * Copyright (C) 2026 VeryBaaad <verybaad@outlook.com>
  */
 
-import '../../styles/zn.css';
+import "../../styles/zn.css";
 
-import { computed } from 'vue';
+import { computed } from "vue";
 
-import type { HookConfig } from '../../api/config';
-import type { InjectorStatus } from '../../api/injector';
-import type { ZnnModule } from '../../api/modules';
-import type { SystemInfo } from '../../api/system';
-import { t } from '../../i18n';
-import ZnAlert from './ZnAlert.vue';
-import ZnConfigCard from './ZnConfigCard.vue';
-import ZnEmptyCard from './ZnEmptyCard.vue';
-import ZnFooter from './ZnFooter.vue';
-import ZnInfoCard from './ZnInfoCard.vue';
-import ZnStatusCard from './ZnStatusCard.vue';
-import ZnTopBar from './ZnTopBar.vue';
+import type { HookConfig } from "../../api/config";
+import type { InjectorStatus } from "../../api/injector";
+import type { ZnnModule } from "../../api/modules";
+import type { SystemInfo } from "../../api/system";
+import { t } from "../../i18n";
+import ZnAlert from "./ZnAlert.vue";
+import ZnConfigCard from "./ZnConfigCard.vue";
+import ZnEmptyCard from "./ZnEmptyCard.vue";
+import ZnFooter from "./ZnFooter.vue";
+import ZnInfoCard from "./ZnInfoCard.vue";
+import ZnStatusCard from "./ZnStatusCard.vue";
+import ZnTopBar from "./ZnTopBar.vue";
 
 const props = defineProps<{
   ksuAvailable: boolean;
@@ -51,25 +51,28 @@ function failed(present: boolean): boolean {
 const modules = computed<ZnnModule[]>(() => props.modules ?? []);
 
 const issueCount = computed(() =>
-  modules.value.reduce((total, module) => total + (module.failed ?? []).length, 0),
+  modules.value.reduce(
+    (total, module) => total + (module.failed ?? []).length,
+    0,
+  ),
 );
 
 const showDashboard = computed(() => props.ksuAvailable);
 
 const EMPTY_SYSTEM: SystemInfo = {
-  kernel: '',
+  kernel: "",
   sdk: 0,
-  abi: '',
-  abilist: '',
+  abi: "",
+  abilist: "",
   root: { magisk: null, kernelSU: null, apatch: null },
 };
 
 const EMPTY_CONFIG: HookConfig = {
-  inlineHook: { value: '', options: [] },
-  pltHook: { value: '', options: [] },
-  mode: { value: '', options: [] },
-  disableZn: { value: '', options: [] },
-  debugdata: { value: '', options: [] },
+  inlineHook: { value: "", options: [] },
+  pltHook: { value: "", options: [] },
+  mode: { value: "", options: [] },
+  disableZn: { value: "", options: [] },
+  debugdata: { value: "", options: [] },
 };
 </script>
 
@@ -79,7 +82,7 @@ const EMPTY_CONFIG: HookConfig = {
 
     <main class="zn-container">
       <ZnAlert v-if="showDashboard && issueCount > 0">
-        {{ t('zn.issue.banner', { n: issueCount }) }}
+        {{ t("zn.issue.banner", { n: issueCount }) }}
       </ZnAlert>
 
       <template v-if="showDashboard">

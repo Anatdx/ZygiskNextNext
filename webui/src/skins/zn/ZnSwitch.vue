@@ -24,11 +24,11 @@ const props = defineProps<{
   label?: string;
 }>();
 
-const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>();
+const emit = defineEmits<{ "update:modelValue": [value: boolean] }>();
 
 function toggle(): void {
   if (props.disabled) return;
-  emit('update:modelValue', !props.modelValue);
+  emit("update:modelValue", !props.modelValue);
 }
 </script>
 

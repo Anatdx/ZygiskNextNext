@@ -24,12 +24,12 @@ import {
   MiuixCard,
   MiuixIcon,
   MiuixSmallTitle,
-} from 'miuix-vue';
-import { computed, ref } from 'vue';
+} from "miuix-vue";
+import { computed, ref } from "vue";
 
-import type { ZnnModule } from '../../api/modules';
-import { t } from '../../i18n';
-import { ChevronForward } from './icons';
+import type { ZnnModule } from "../../api/modules";
+import { t } from "../../i18n";
+import { ChevronForward } from "./icons";
 
 const props = defineProps<{ modules: ZnnModule[] }>();
 
@@ -42,19 +42,19 @@ const processes = computed(() => selected.value?.processes ?? []);
 const failures = computed(() => selected.value?.failed ?? []);
 
 const sheetTitle = computed(() =>
-  selected.value ? `${selected.value.name} (${selected.value.id})` : '',
+  selected.value ? `${selected.value.name} (${selected.value.id})` : "",
 );
 
 const basename = (value: string): string => {
-  const cut = value.lastIndexOf('/');
+  const cut = value.lastIndexOf("/");
   return cut >= 0 ? value.slice(cut + 1) : value;
 };
 
 function summary(module: ZnnModule): string {
-  const parts = [t('modules.processes', { n: module.processes.length })];
+  const parts = [t("modules.processes", { n: module.processes.length })];
   const failed = (module.failed ?? []).length;
-  if (failed > 0) parts.push(t('modules.failed', { n: failed }));
-  return parts.join(' · ');
+  if (failed > 0) parts.push(t("modules.failed", { n: failed }));
+  return parts.join(" · ");
 }
 
 function open(module: ZnnModule): void {
@@ -80,7 +80,9 @@ function open(module: ZnnModule): void {
       @click="open(module)"
     >
       <template #end>
-        <span class="miuix-chevron"><MiuixIcon :icon="ChevronForward" :size="20" /></span>
+        <span class="miuix-chevron"
+          ><MiuixIcon :icon="ChevronForward" :size="20"
+        /></span>
       </template>
     </MiuixBasicComponent>
   </MiuixCard>
@@ -98,7 +100,10 @@ function open(module: ZnnModule): void {
       :summary="`pid=${process.pid}`"
     />
     <template v-if="failures.length > 0">
-      <MiuixSmallTitle class="miuix-sheet-section" :text="t('modules.failedTitle')" />
+      <MiuixSmallTitle
+        class="miuix-sheet-section"
+        :text="t('modules.failedTitle')"
+      />
       <MiuixBasicComponent
         v-for="failure in failures"
         :key="`${failure.name}-${failure.reason}`"

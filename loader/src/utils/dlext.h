@@ -23,4 +23,4 @@ namespace znn {
 
 void* dlopenFd(int fd, const char* name, int flags);
 
-}  //namespace znn
+}  // namespace znn

@@ -18,13 +18,16 @@
  * Copyright (C) 2026 VeryBaaad <verybaad@outlook.com>
  */
 
-import { ref } from 'vue';
+import { ref } from "vue";
 
-import ZnIcon from './ZnIcon.vue';
+import ZnIcon from "./ZnIcon.vue";
 
-const props = withDefaults(defineProps<{ title: string; initiallyOpen?: boolean }>(), {
-  initiallyOpen: false,
-});
+const props = withDefaults(
+  defineProps<{ title: string; initiallyOpen?: boolean }>(),
+  {
+    initiallyOpen: false,
+  },
+);
 
 const expanded = ref(props.initiallyOpen);
 

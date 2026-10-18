@@ -19,75 +19,80 @@
 
 #include "hook/plt.h"
 
+#include <sys/mman.h>
+
+#include <vector>
+
 #include "hook/backend.h"
 #include "hook/engine.h"
 #include "log.h"
 #include "utils/elf_util.h"
 
-#include <sys/mman.h>
-#include <vector>
-
 namespace znn::hook {
 namespace {
 
 const MapEntry* findMapping(const std::vector<MapEntry>& maps, uintptr_t base) {
-    for (const auto& m : maps) {
-        if (m.inode == 0) continue;
-        if (base >= m.start && base < m.end) return &m;
-        if (m.start >= m.offset && base == m.start - m.offset) return &m;
-    }
-    return nullptr;
+  for (const auto& m : maps) {
+    if (m.inode == 0) continue;
+    if (base >= m.start && base < m.end) return &m;
+    if (m.start >= m.offset && base == m.start - m.offset) return &m;
+  }
+  return nullptr;
 }
 
-const MapEntry* firstMappingOfFile(const std::vector<MapEntry>& maps, const MapEntry& hit) {
-    if (hit.start < hit.offset) return &hit;
-    const uintptr_t load_base = hit.start - hit.offset;
-    const MapEntry* first_readable = nullptr;
-    for (const auto& m : maps) {
-        if (m.dev != hit.dev || m.inode != hit.inode) continue;
-        if (m.start < m.offset || m.start - m.offset != load_base) continue;
-        if (!(m.perms & PROT_READ)) continue;
-        if (m.offset == 0) return &m;
-        if (!first_readable) first_readable = &m;
-    }
-    return first_readable ? first_readable : &hit;
+const MapEntry* firstMappingOfFile(const std::vector<MapEntry>& maps,
+                                   const MapEntry& hit) {
+  if (hit.start < hit.offset) return &hit;
+  const uintptr_t load_base = hit.start - hit.offset;
+  const MapEntry* first_readable = nullptr;
+  for (const auto& m : maps) {
+    if (m.dev != hit.dev || m.inode != hit.inode) continue;
+    if (m.start < m.offset || m.start - m.offset != load_base) continue;
+    if (!(m.perms & PROT_READ)) continue;
+    if (m.offset == 0) return &m;
+    if (!first_readable) first_readable = &m;
+  }
+  return first_readable ? first_readable : &hit;
 }
 
-}  //namespace
+}  // namespace
 
-bool pltHook(void* base, const char* symbol, void* replacement, void** original) {
-    if (!base || !symbol || !replacement) return false;
-    ensurePltEngineReady();
+bool pltHook(void* base, const char* symbol, void* replacement,
+             void** original) {
+  if (!base || !symbol || !replacement) return false;
+  ensurePltEngineReady();
 
-    const uintptr_t b = reinterpret_cast<uintptr_t>(base);
-    const auto maps = parseMaps("self");
-    const MapEntry* hit = findMapping(maps, b);
-    if (!hit) {
-        LOGE("pltHook %s: base %p not found in maps", symbol, base);
-        return false;
-    }
-    const MapEntry* entry = firstMappingOfFile(maps, *hit);
-    if (entry->path.empty()) {
-        LOGE("pltHook %s: base %p has no path in maps", symbol, base);
-        return false;
-    }
-    LOGI("pltHook base=%p symbol=%s path=%s dev=%llu inode=%llu", base, symbol, entry->path.c_str(),
-         static_cast<unsigned long long>(entry->dev),
-         static_cast<unsigned long long>(entry->inode));
-
-    switch (pltEngine()) {
-        case PltEngine::kLsplt:
-            return backend::lspltHook(entry->dev, entry->inode, symbol, replacement, original);
-        case PltEngine::kByteHook:
-            return backend::bytehookHook(entry->path, symbol, replacement, original);
-        case PltEngine::kXHook:
-            return backend::xhookHook(entry->path, symbol, replacement, original);
-        case PltEngine::kPlti:
-            return backend::pltiHook(entry->path, entry->start, symbol, replacement, original);
-        case PltEngine::kDisable:
-            return false;
-    }
+  const uintptr_t b = reinterpret_cast<uintptr_t>(base);
+  const auto maps = parseMaps("self");
+  const MapEntry* hit = findMapping(maps, b);
+  if (!hit) {
+    LOGE("pltHook %s: base %p not found in maps", symbol, base);
     return false;
+  }
+  const MapEntry* entry = firstMappingOfFile(maps, *hit);
+  if (entry->path.empty()) {
+    LOGE("pltHook %s: base %p has no path in maps", symbol, base);
+    return false;
+  }
+  LOGI("pltHook base=%p symbol=%s path=%s dev=%llu inode=%llu", base, symbol,
+       entry->path.c_str(), static_cast<unsigned long long>(entry->dev),
+       static_cast<unsigned long long>(entry->inode));
+
+  switch (pltEngine()) {
+    case PltEngine::kLsplt:
+      return backend::lspltHook(entry->dev, entry->inode, symbol, replacement,
+                                original);
+    case PltEngine::kByteHook:
+      return backend::bytehookHook(entry->path, symbol, replacement, original);
+    case PltEngine::kXHook:
+      return backend::xhookHook(entry->path, symbol, replacement, original);
+    case PltEngine::kPlti:
+      return backend::pltiHook(entry->path, entry->start, symbol, replacement,
+                               original);
+    case PltEngine::kDisable:
+      return false;
+  }
+  return false;
 }
 
-}  //namespace znn::hook
+}  // namespace znn::hook

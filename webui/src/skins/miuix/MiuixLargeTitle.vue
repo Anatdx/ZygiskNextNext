@@ -18,10 +18,10 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { MiuixText } from 'miuix-vue';
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { MiuixText } from "miuix-vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 
-import { MODULE_NAME } from '../../app-info';
+import { MODULE_NAME } from "../../app-info";
 
 /**
  * The large title lives in the page scroll flow so it scrolls away under the
@@ -30,11 +30,11 @@ import { MODULE_NAME } from '../../app-info';
  * fades in at the same point. The published MiuixTopAppBar has no collapsing
  * form, so this is the replacement for it.
  */
-const SHELL_SELECTOR = '.znn-miuix';
+const SHELL_SELECTOR = ".znn-miuix";
 
-const LARGE_FADE_VAR = '--znn-miuix-large-fade';
+const LARGE_FADE_VAR = "--znn-miuix-large-fade";
 
-const SMALL_ALPHA_VAR = '--znn-miuix-small-alpha';
+const SMALL_ALPHA_VAR = "--znn-miuix-small-alpha";
 
 const largeTitle = ref<HTMLElement | null>(null);
 
@@ -47,7 +47,7 @@ function findScroller(from: HTMLElement | null): HTMLElement | null {
   let node = from?.parentElement ?? null;
   while (node) {
     const overflowY = getComputedStyle(node).overflowY;
-    if (overflowY === 'auto' || overflowY === 'scroll') return node;
+    if (overflowY === "auto" || overflowY === "scroll") return node;
     node = node.parentElement;
   }
   return null;
@@ -66,7 +66,7 @@ function update(): void {
   const fraction = Math.min(1, Math.max(0, scroller.scrollTop / expansion));
   const fade = Math.min(1, fraction * 3);
   shell.style.setProperty(LARGE_FADE_VAR, fade.toFixed(4));
-  shell.style.setProperty(SMALL_ALPHA_VAR, fade >= 1 ? '1' : '0');
+  shell.style.setProperty(SMALL_ALPHA_VAR, fade >= 1 ? "1" : "0");
 }
 
 function scheduleUpdate(): void {
@@ -85,14 +85,14 @@ function onResize(): void {
 onMounted(() => {
   measure();
   scroller = findScroller(largeTitle.value);
-  scroller?.addEventListener('scroll', scheduleUpdate, { passive: true });
-  window.addEventListener('resize', onResize, { passive: true });
+  scroller?.addEventListener("scroll", scheduleUpdate, { passive: true });
+  window.addEventListener("resize", onResize, { passive: true });
   scheduleUpdate();
 });
 
 onBeforeUnmount(() => {
-  scroller?.removeEventListener('scroll', scheduleUpdate);
-  window.removeEventListener('resize', onResize);
+  scroller?.removeEventListener("scroll", scheduleUpdate);
+  window.removeEventListener("resize", onResize);
   if (frame) cancelAnimationFrame(frame);
   frame = 0;
 });

@@ -27,4 +27,4 @@ std::string exePath();
 
 std::string exeName();
 
-}  //namespace znn::process
+}  // namespace znn::process

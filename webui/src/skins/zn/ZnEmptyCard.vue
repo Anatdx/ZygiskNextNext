@@ -18,13 +18,13 @@
  * Copyright (C) 2026 VeryBaaad <verybaad@outlook.com>
  */
 
-import { t } from '../../i18n';
+import { t } from "../../i18n";
 </script>
 
 <template>
   <section class="zn-card">
     <div class="zn-card-body">
-      <div class="zn-empty-line">{{ t('empty.title') }}</div>
+      <div class="zn-empty-line">{{ t("empty.title") }}</div>
     </div>
   </section>
 </template>

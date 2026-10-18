@@ -18,19 +18,24 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { GITHUB_URL } from '../../app-info';
-import { t } from '../../i18n';
-import ZnIcon from './ZnIcon.vue';
+import { GITHUB_URL } from "../../app-info";
+import { t } from "../../i18n";
+import ZnIcon from "./ZnIcon.vue";
 </script>
 
 <template>
   <footer class="zn-footer">
     <div class="zn-link-row">
-      <a class="zn-link" :href="GITHUB_URL" target="_blank" rel="noopener noreferrer">
+      <a
+        class="zn-link"
+        :href="GITHUB_URL"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <ZnIcon class="github-logo" name="github" :size="18" />
-        {{ t('footer.github') }}
+        {{ t("footer.github") }}
       </a>
     </div>
-    <span class="zn-credit">{{ t('zn.credit') }}</span>
+    <span class="zn-credit">{{ t("zn.credit") }}</span>
   </footer>
 </template>

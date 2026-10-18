@@ -24,4 +24,4 @@ namespace znn::hook {
 bool inlineHook(void* target, void* replacement, void** original);
 bool inlineUnhook(void* target);
 
-}  //namespace znn::hook
+}  // namespace znn::hook

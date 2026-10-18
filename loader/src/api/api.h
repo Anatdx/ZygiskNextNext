@@ -19,49 +19,51 @@
 
 #pragma once
 
+#include <cstddef>
+
 #include "api/resolver.h"
 #include "zygisk_next_api.h"
 
-#include <cstddef>
-
 namespace znn::api {
 
-//hook api
+// hook api
 int pltHook(void* base, const char* symbol, void* hook, void** original);
 int inlineHook(void* target, void* addr, void** original);
 int inlineUnhook(void* target);
 
-//resolver api (v2+)
+// resolver api (v2+)
 ZnSymbolResolver* newSymbolResolver(const char* path, void* base);
 void freeSymbolResolver(ZnSymbolResolver* resolver);
 void* getBaseAddress(ZnSymbolResolver* resolver);
-void* symbolLookup(ZnSymbolResolver* resolver, const char* name, bool prefix, size_t* size);
+void* symbolLookup(ZnSymbolResolver* resolver, const char* name, bool prefix,
+                   size_t* size);
 void forEachSymbols(ZnSymbolResolver* resolver,
-                    bool (*callback)(const char* name, void* addr, size_t size, void* data),
+                    bool (*callback)(const char* name, void* addr, size_t size,
+                                     void* data),
                     void* data);
 
-//resolver stubs below v2
+// resolver stubs below v2
 ZnSymbolResolver* newSymbolResolverUnavailable(const char* path, void* base);
 void freeSymbolResolverUnavailable(ZnSymbolResolver* resolver);
 void* getBaseAddressUnavailable(ZnSymbolResolver* resolver);
-void* symbolLookupUnavailable(ZnSymbolResolver* resolver, const char* name, bool prefix,
-                              size_t* size);
+void* symbolLookupUnavailable(ZnSymbolResolver* resolver, const char* name,
+                              bool prefix, size_t* size);
 void forEachSymbolsUnavailable(ZnSymbolResolver* resolver,
-                               bool (*callback)(const char* name, void* addr, size_t size,
-                                                void* data),
+                               bool (*callback)(const char* name, void* addr,
+                                                size_t size, void* data),
                                void* data);
 
-//companion api (v3+)
+// companion api (v3+)
 int connectCompanion(void* handle);
 
-//companion stub below v3
+// companion stub below v3
 int connectCompanionUnavailable(void* handle);
 
-//runtime api (v4+)
+// runtime api (v4+)
 const ZygiskNextRuntime* getRuntime();
 const ZygiskNextRuntime* getRuntimeUnavailable();
 
-//table per target api version
+// table per target api version
 const ZygiskNextAPI* apiForVersion(int target_api_version);
 
-}  //namespace znn::api
+}  // namespace znn::api

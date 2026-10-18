@@ -17,7 +17,7 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { nextTick, onBeforeUnmount, ref, watch, type Ref } from 'vue';
+import { nextTick, onBeforeUnmount, ref, watch, type Ref } from "vue";
 
 const VIEWPORT_MARGIN = 8;
 
@@ -48,12 +48,12 @@ export function usePopover(getRoot: () => HTMLElement | null): Popover {
   }
 
   function onKeyDown(event: KeyboardEvent): void {
-    if (event.key === 'Escape') close();
+    if (event.key === "Escape") close();
   }
 
   function reposition(): void {
     const element = getRoot();
-    const panel = element?.querySelector<HTMLElement>('.zn-menu');
+    const panel = element?.querySelector<HTMLElement>(".zn-menu");
     if (!element || !panel) return;
     const anchor = element.getBoundingClientRect();
     const height = panel.getBoundingClientRect().height;
@@ -64,25 +64,25 @@ export function usePopover(getRoot: () => HTMLElement | null): Popover {
 
   watch(open, (isOpen) => {
     if (isOpen) {
-      document.addEventListener('pointerdown', onPointerDown, true);
-      document.addEventListener('keydown', onKeyDown);
-      window.addEventListener('resize', reposition, { passive: true });
-      window.addEventListener('scroll', reposition, { passive: true });
+      document.addEventListener("pointerdown", onPointerDown, true);
+      document.addEventListener("keydown", onKeyDown);
+      window.addEventListener("resize", reposition, { passive: true });
+      window.addEventListener("scroll", reposition, { passive: true });
       void nextTick(reposition);
       return;
     }
-    document.removeEventListener('pointerdown', onPointerDown, true);
-    document.removeEventListener('keydown', onKeyDown);
-    window.removeEventListener('resize', reposition);
-    window.removeEventListener('scroll', reposition);
+    document.removeEventListener("pointerdown", onPointerDown, true);
+    document.removeEventListener("keydown", onKeyDown);
+    window.removeEventListener("resize", reposition);
+    window.removeEventListener("scroll", reposition);
     above.value = false;
   });
 
   onBeforeUnmount(() => {
-    document.removeEventListener('pointerdown', onPointerDown, true);
-    document.removeEventListener('keydown', onKeyDown);
-    window.removeEventListener('resize', reposition);
-    window.removeEventListener('scroll', reposition);
+    document.removeEventListener("pointerdown", onPointerDown, true);
+    document.removeEventListener("keydown", onKeyDown);
+    window.removeEventListener("resize", reposition);
+    window.removeEventListener("scroll", reposition);
   });
 
   return { open, above, toggle, close };

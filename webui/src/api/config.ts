@@ -17,7 +17,7 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { apiBinary, execJson, shellQuote } from './ksu';
+import { apiBinary, execJson, shellQuote } from "./ksu";
 
 export interface HookEngineEntry {
   value: string;
@@ -32,15 +32,15 @@ export interface HookConfig {
   disableZn: HookEngineEntry;
 }
 
-export type HookKind = 'inline' | 'plt' | 'mode' | 'debugdata' | 'disable-zn';
+export type HookKind = "inline" | "plt" | "mode" | "debugdata" | "disable-zn";
 
 function isHookEngineEntry(value: unknown): value is HookEngineEntry {
-  if (typeof value !== 'object' || value === null) return false;
+  if (typeof value !== "object" || value === null) return false;
   const entry = value as { value?: unknown; options?: unknown };
   return (
-    typeof entry.value === 'string' &&
+    typeof entry.value === "string" &&
     Array.isArray(entry.options) &&
-    entry.options.every((option) => typeof option === 'string')
+    entry.options.every((option) => typeof option === "string")
   );
 }
 
@@ -53,12 +53,12 @@ interface LegacyHookConfig {
 }
 
 const DEFAULT_DISABLE_ZN: HookEngineEntry = {
-  value: 'true',
-  options: ['true', 'false'],
+  value: "true",
+  options: ["true", "false"],
 };
 
 function isHookConfig(value: unknown): value is LegacyHookConfig {
-  if (typeof value !== 'object' || value === null) return false;
+  if (typeof value !== "object" || value === null) return false;
   const config = value as Record<string, unknown>;
   return (
     isHookEngineEntry(config.inlineHook) &&
@@ -70,7 +70,7 @@ function isHookConfig(value: unknown): value is LegacyHookConfig {
 }
 
 function parseHookConfig(raw: unknown): HookConfig {
-  if (!isHookConfig(raw)) throw new Error('unexpected config response');
+  if (!isHookConfig(raw)) throw new Error("unexpected config response");
   return {
     inlineHook: raw.inlineHook,
     pltHook: raw.pltHook,
@@ -81,11 +81,18 @@ function parseHookConfig(raw: unknown): HookConfig {
 }
 
 export async function getHookConfig(): Promise<HookConfig> {
-  return parseHookConfig(await execJson<unknown>(`${apiBinary()} --ctl config`));
+  return parseHookConfig(
+    await execJson<unknown>(`${apiBinary()} --ctl config`),
+  );
 }
 
-export async function setHookConfig(kind: HookKind, value: string): Promise<HookConfig> {
+export async function setHookConfig(
+  kind: HookKind,
+  value: string,
+): Promise<HookConfig> {
   return parseHookConfig(
-    await execJson<unknown>(`${apiBinary()} --ctl config-set ${shellQuote(kind)} ${shellQuote(value)}`),
+    await execJson<unknown>(
+      `${apiBinary()} --ctl config-set ${shellQuote(kind)} ${shellQuote(value)}`,
+    ),
   );
 }

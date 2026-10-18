@@ -17,7 +17,7 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { apiBinary, execJson } from './ksu';
+import { apiBinary, execJson } from "./ksu";
 
 export interface RootImplementation {
   magisk: string | null;
@@ -34,20 +34,26 @@ export interface SystemInfo {
 }
 
 function asString(value: unknown): string {
-  return typeof value === 'string' ? value : '';
+  return typeof value === "string" ? value : "";
 }
 
 function asRootString(value: unknown): string | null {
-  return typeof value === 'string' ? value : null;
+  return typeof value === "string" ? value : null;
 }
 
 export async function getSystemInfo(): Promise<SystemInfo> {
   const raw = await execJson<unknown>(`${apiBinary()} --ctl system`);
-  const info = typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>) : {};
-  const root = typeof info.root === 'object' && info.root !== null ? (info.root as Record<string, unknown>) : {};
+  const info =
+    typeof raw === "object" && raw !== null
+      ? (raw as Record<string, unknown>)
+      : {};
+  const root =
+    typeof info.root === "object" && info.root !== null
+      ? (info.root as Record<string, unknown>)
+      : {};
   return {
     kernel: asString(info.kernel),
-    sdk: typeof info.sdk === 'number' ? info.sdk : 0,
+    sdk: typeof info.sdk === "number" ? info.sdk : 0,
     abi: asString(info.abi),
     abilist: asString(info.abilist),
     root: {
@@ -60,5 +66,10 @@ export async function getSystemInfo(): Promise<SystemInfo> {
 
 export function cleanVersion(raw: string | null): string | null {
   if (!raw) return null;
-  return raw.replace(/^(ksud|apd|magisk)\s+/i, '').replace(/^v/i, '').trim() || null;
+  return (
+    raw
+      .replace(/^(ksud|apd|magisk)\s+/i, "")
+      .replace(/^v/i, "")
+      .trim() || null
+  );
 }

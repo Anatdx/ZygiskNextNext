@@ -18,21 +18,21 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { computed } from 'vue';
+import { computed } from "vue";
 
-import { VER_NAME } from '../../app-info';
-import type { InjectorStatus } from '../../api/injector';
-import { t } from '../../i18n';
+import { VER_NAME } from "../../app-info";
+import type { InjectorStatus } from "../../api/injector";
+import { t } from "../../i18n";
 
 const props = defineProps<{ status: InjectorStatus }>();
 
 const mode = computed(() => {
-  if (!props.status.running) return '';
-  if (props.status.mode === 'kernel') return t('config.mode.kernel');
-  if (props.status.mode === 'proc') return t('config.mode.proc');
-  if (props.status.mode === 'ptrace') return t('config.mode.ptrace');
-  if (props.status.mode === 'late') return t('config.mode.late');
-  return '';
+  if (!props.status.running) return "";
+  if (props.status.mode === "kernel") return t("config.mode.kernel");
+  if (props.status.mode === "proc") return t("config.mode.proc");
+  if (props.status.mode === "ptrace") return t("config.mode.ptrace");
+  if (props.status.mode === "late") return t("config.mode.late");
+  return "";
 });
 </script>
 
@@ -46,7 +46,9 @@ const mode = computed(() => {
         :filled="true"
       ></m3e-icon>
       <div class="status-text">
-        <div class="status-label">{{ t(props.status.running ? 'status.active' : 'status.inactive') }}</div>
+        <div class="status-label">
+          {{ t(props.status.running ? "status.active" : "status.inactive") }}
+        </div>
         <div class="status-version">{{ VER_NAME }}</div>
       </div>
       <span v-if="mode" class="status-badge">{{ mode }}</span>

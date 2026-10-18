@@ -18,13 +18,18 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from "vue";
 
-import { MODULE_ID, MODULE_NAME } from '../../app-info';
-import { useAppActions } from '../../composables/app-actions';
-import { LOCALE_LABELS, LOCALES, locale, setLocale, t } from '../../i18n';
-import { THEME_MODES, setThemeMode, themeMode, type ThemeMode } from '../../theme';
-import { cubicBezier } from '../../util/easing';
+import { MODULE_ID, MODULE_NAME } from "../../app-info";
+import { useAppActions } from "../../composables/app-actions";
+import { LOCALE_LABELS, LOCALES, locale, setLocale, t } from "../../i18n";
+import {
+  THEME_MODES,
+  setThemeMode,
+  themeMode,
+  type ThemeMode,
+} from "../../theme";
+import { cubicBezier } from "../../util/easing";
 
 const props = defineProps<{
   ksuAvailable: boolean;
@@ -32,24 +37,24 @@ const props = defineProps<{
 }>();
 
 const THEME_ICONS: Record<ThemeMode, string> = {
-  auto: 'brightness_auto',
-  light: 'light_mode',
-  dark: 'dark_mode',
+  auto: "brightness_auto",
+  light: "light_mode",
+  dark: "dark_mode",
 };
 
 const THEME_LABEL_KEYS: Record<ThemeMode, string> = {
-  auto: 'theme.auto',
-  light: 'theme.light',
-  dark: 'theme.dark',
+  auto: "theme.auto",
+  light: "theme.light",
+  dark: "theme.dark",
 };
 
-const PROGRESS_VAR = '--znn-bar-progress';
+const PROGRESS_VAR = "--znn-bar-progress";
 
-const TITLE_ALPHA_VAR = '--znn-bar-title-alpha';
+const TITLE_ALPHA_VAR = "--znn-bar-title-alpha";
 
-const EXPANDED_VAR = '--znn-bar-expanded';
+const EXPANDED_VAR = "--znn-bar-expanded";
 
-const COLLAPSED_VAR = '--znn-bar-collapsed';
+const COLLAPSED_VAR = "--znn-bar-collapsed";
 
 const COLLAPSED_TITLE_EASING = cubicBezier(0.8, 0, 0.8, 0.15);
 
@@ -84,7 +89,10 @@ function updateScrollState(): void {
   const scrolled = window.scrollY || document.documentElement.scrollTop || 0;
   const progress = Math.min(1, Math.max(0, scrolled / collapseSpan));
   el.style.setProperty(PROGRESS_VAR, progress.toFixed(4));
-  el.style.setProperty(TITLE_ALPHA_VAR, COLLAPSED_TITLE_EASING(progress).toFixed(4));
+  el.style.setProperty(
+    TITLE_ALPHA_VAR,
+    COLLAPSED_TITLE_EASING(progress).toFixed(4),
+  );
 }
 
 function onResize(): void {
@@ -93,14 +101,14 @@ function onResize(): void {
 }
 
 onMounted(() => {
-  window.addEventListener('scroll', scheduleUpdate, { passive: true });
-  window.addEventListener('resize', onResize, { passive: true });
+  window.addEventListener("scroll", scheduleUpdate, { passive: true });
+  window.addEventListener("resize", onResize, { passive: true });
   scheduleUpdate();
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', scheduleUpdate);
-  window.removeEventListener('resize', onResize);
+  window.removeEventListener("scroll", scheduleUpdate);
+  window.removeEventListener("resize", onResize);
   if (frame) cancelAnimationFrame(frame);
   frame = 0;
 });

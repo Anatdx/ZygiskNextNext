@@ -17,16 +17,16 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { inject, provide, type InjectionKey } from 'vue';
+import { inject, provide, type InjectionKey } from "vue";
 
-import type { HookKind } from '../api/config';
+import type { HookKind } from "../api/config";
 
 export interface AppActions {
   refresh: () => void;
   applyHookConfig: (kind: HookKind, value: string) => Promise<void>;
 }
 
-const APP_ACTIONS: InjectionKey<AppActions> = Symbol('znn-app-actions');
+const APP_ACTIONS: InjectionKey<AppActions> = Symbol("znn-app-actions");
 
 export function provideAppActions(actions: AppActions): void {
   provide(APP_ACTIONS, actions);
@@ -34,6 +34,6 @@ export function provideAppActions(actions: AppActions): void {
 
 export function useAppActions(): AppActions {
   const actions = inject(APP_ACTIONS);
-  if (!actions) throw new Error('app actions were not provided');
+  if (!actions) throw new Error("app actions were not provided");
   return actions;
 }

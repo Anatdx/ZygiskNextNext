@@ -18,7 +18,6 @@
  */
 
 #include "hook/backend.h"
-
 #include "log.h"
 
 #ifndef __riscv
@@ -29,27 +28,28 @@ namespace znn::hook::backend {
 
 bool dobbyHook(void* target, void* replacement, void** original) {
 #ifndef __riscv
-    if (DobbyHook(target, reinterpret_cast<dobby_dummy_func_t>(replacement),
-                  reinterpret_cast<dobby_dummy_func_t*>(original)) != RS_SUCCESS) {
-        LOGE("inlineHook %p failed", target);
-        return false;
-    }
-    return true;
-#else
-    (void)target;
-    (void)replacement;
-    (void)original;
+  if (DobbyHook(target, reinterpret_cast<dobby_dummy_func_t>(replacement),
+                reinterpret_cast<dobby_dummy_func_t*>(original)) !=
+      RS_SUCCESS) {
+    LOGE("inlineHook %p failed", target);
     return false;
+  }
+  return true;
+#else
+  (void)target;
+  (void)replacement;
+  (void)original;
+  return false;
 #endif
 }
 
 bool dobbyUnhook(void* target) {
 #ifndef __riscv
-    return DobbyDestroy(target) == RS_SUCCESS;
+  return DobbyDestroy(target) == RS_SUCCESS;
 #else
-    (void)target;
-    return false;
+  (void)target;
+  return false;
 #endif
 }
 
-}  //namespace znn::hook::backend
+}  // namespace znn::hook::backend

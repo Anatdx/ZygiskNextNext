@@ -26,22 +26,23 @@
 namespace znn::process {
 
 std::string exePath() {
-    char buf[PATH_MAX];
-    ssize_t n = readlink("/proc/self/exe", buf, sizeof(buf) - 1);
-    if (n <= 0) return {};
-    std::string p(buf, static_cast<size_t>(n));
-    constexpr char kDeleted[] = " (deleted)";
-    constexpr size_t kDeletedLen = sizeof(kDeleted) - 1;
-    if (p.size() > kDeletedLen && p.compare(p.size() - kDeletedLen, kDeletedLen, kDeleted) == 0) {
-        p.resize(p.size() - kDeletedLen);
-    }
-    return p;
+  char buf[PATH_MAX];
+  ssize_t n = readlink("/proc/self/exe", buf, sizeof(buf) - 1);
+  if (n <= 0) return {};
+  std::string p(buf, static_cast<size_t>(n));
+  constexpr char kDeleted[] = " (deleted)";
+  constexpr size_t kDeletedLen = sizeof(kDeleted) - 1;
+  if (p.size() > kDeletedLen &&
+      p.compare(p.size() - kDeletedLen, kDeletedLen, kDeleted) == 0) {
+    p.resize(p.size() - kDeletedLen);
+  }
+  return p;
 }
 
 std::string exeName() {
-    const std::string p = exePath();
-    const auto pos = p.rfind('/');
-    return pos == std::string::npos ? p : p.substr(pos + 1);
+  const std::string p = exePath();
+  const auto pos = p.rfind('/');
+  return pos == std::string::npos ? p : p.substr(pos + 1);
 }
 
-}  //namespace znn::process
+}  // namespace znn::process

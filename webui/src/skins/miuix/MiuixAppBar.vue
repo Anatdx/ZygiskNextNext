@@ -24,14 +24,19 @@ import {
   MiuixIconButton,
   MiuixRadioButtonPreference,
   MiuixTopAppBar,
-} from 'miuix-vue';
-import { ref } from 'vue';
+} from "miuix-vue";
+import { ref } from "vue";
 
-import { MODULE_NAME } from '../../app-info';
-import { useAppActions } from '../../composables/app-actions';
-import { LOCALE_LABELS, LOCALES, locale, setLocale, t } from '../../i18n';
-import { THEME_MODES, setThemeMode, themeMode, type ThemeMode } from '../../theme';
-import { Refresh, Theme, Translate } from './icons';
+import { MODULE_NAME } from "../../app-info";
+import { useAppActions } from "../../composables/app-actions";
+import { LOCALE_LABELS, LOCALES, locale, setLocale, t } from "../../i18n";
+import {
+  THEME_MODES,
+  setThemeMode,
+  themeMode,
+  type ThemeMode,
+} from "../../theme";
+import { Refresh, Theme, Translate } from "./icons";
 
 const props = defineProps<{
   ksuAvailable: boolean;
@@ -39,9 +44,9 @@ const props = defineProps<{
 }>();
 
 const THEME_LABEL_KEYS: Record<ThemeMode, string> = {
-  auto: 'theme.auto',
-  light: 'theme.light',
-  dark: 'theme.dark',
+  auto: "theme.auto",
+  light: "theme.light",
+  dark: "theme.dark",
 };
 
 const actions = useAppActions();
@@ -71,10 +76,16 @@ function pickLocale(next: (typeof LOCALES)[number]): void {
       >
         <MiuixIcon :icon="Refresh" :size="24" />
       </MiuixIconButton>
-      <MiuixIconButton :aria-label="t('topbar.themeLabel')" @click="themeSheet = true">
+      <MiuixIconButton
+        :aria-label="t('topbar.themeLabel')"
+        @click="themeSheet = true"
+      >
         <MiuixIcon :icon="Theme" :size="24" />
       </MiuixIconButton>
-      <MiuixIconButton :aria-label="t('topbar.langLabel')" @click="localeSheet = true">
+      <MiuixIconButton
+        :aria-label="t('topbar.langLabel')"
+        @click="localeSheet = true"
+      >
         <MiuixIcon :icon="Translate" :size="24" />
       </MiuixIconButton>
     </template>

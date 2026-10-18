@@ -18,11 +18,11 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { computed } from 'vue';
+import { computed } from "vue";
 
-import type { InjectorStatus } from '../../api/injector';
-import { cleanVersion, type SystemInfo } from '../../api/system';
-import { t } from '../../i18n';
+import type { InjectorStatus } from "../../api/injector";
+import { cleanVersion, type SystemInfo } from "../../api/system";
+import { t } from "../../i18n";
 
 interface RootEntry {
   name: string;
@@ -41,42 +41,43 @@ const props = defineProps<{
 
 const rootImplText = computed(() => {
   const entries: RootEntry[] = [
-    { name: 'KernelSU', version: cleanVersion(props.system.root.kernelSU) },
-    { name: 'Magisk', version: cleanVersion(props.system.root.magisk) },
-    { name: 'APatch', version: cleanVersion(props.system.root.apatch) },
+    { name: "KernelSU", version: cleanVersion(props.system.root.kernelSU) },
+    { name: "Magisk", version: cleanVersion(props.system.root.magisk) },
+    { name: "APatch", version: cleanVersion(props.system.root.apatch) },
   ].filter((entry) => entry.version !== null);
-  if (entries.length === 0) return t('info.rootImpl.none');
-  return entries.map((entry) => `${entry.name} (${entry.version})`).join(', ');
+  if (entries.length === 0) return t("info.rootImpl.none");
+  return entries.map((entry) => `${entry.name} (${entry.version})`).join(", ");
 });
 
 const modeText = computed(() => {
-  if (!props.status?.running) return t('info.unknown');
-  if (props.status.mode === 'kernel') return t('config.mode.kernel');
-  if (props.status.mode === 'proc') return t('config.mode.proc');
-  if (props.status.mode === 'ptrace') return t('config.mode.ptrace');
-  if (props.status.mode === 'late') return t('config.mode.late');
-  return t('info.unknown');
+  if (!props.status?.running) return t("info.unknown");
+  if (props.status.mode === "kernel") return t("config.mode.kernel");
+  if (props.status.mode === "proc") return t("config.mode.proc");
+  if (props.status.mode === "ptrace") return t("config.mode.ptrace");
+  if (props.status.mode === "late") return t("config.mode.late");
+  return t("info.unknown");
 });
 
 const abiText = computed(() => {
-  const primary = (props.system.abi || '').trim();
-  const rest = (props.system.abilist || '')
-    .split(',')
+  const primary = (props.system.abi || "").trim();
+  const rest = (props.system.abilist || "")
+    .split(",")
     .map((value) => value.trim())
     .filter((value) => value.length > 0 && value !== primary);
-  const parts = [primary ? `${primary} (primary)` : t('info.unknown')];
+  const parts = [primary ? `${primary} (primary)` : t("info.unknown")];
   parts.push(...rest);
-  return parts.join(', ');
+  return parts.join(", ");
 });
 
 const rows = computed<InfoRow[]>(() => {
-  const sdk = props.system.sdk > 0 ? String(props.system.sdk) : t('info.unknown');
+  const sdk =
+    props.system.sdk > 0 ? String(props.system.sdk) : t("info.unknown");
   return [
-    { label: t('info.rootImpl'), value: rootImplText.value },
-    { label: 'Kernel', value: props.system.kernel || t('info.unknown') },
-    { label: 'Android SDK', value: sdk },
-    { label: 'ABI', value: abiText.value },
-    { label: t('info.mode'), value: modeText.value },
+    { label: t("info.rootImpl"), value: rootImplText.value },
+    { label: "Kernel", value: props.system.kernel || t("info.unknown") },
+    { label: "Android SDK", value: sdk },
+    { label: "ABI", value: abiText.value },
+    { label: t("info.mode"), value: modeText.value },
   ];
 });
 </script>

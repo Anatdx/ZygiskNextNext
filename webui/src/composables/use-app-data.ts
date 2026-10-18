@@ -17,13 +17,18 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { ref, type Ref } from 'vue';
+import { ref, type Ref } from "vue";
 
-import { getHookConfig, setHookConfig, type HookConfig, type HookKind } from '../api/config';
-import { getInjectorStatus, type InjectorStatus } from '../api/injector';
-import { isKsuAvailable } from '../api/ksu';
-import { getModules, type ZnnModule } from '../api/modules';
-import { getSystemInfo, type SystemInfo } from '../api/system';
+import {
+  getHookConfig,
+  setHookConfig,
+  type HookConfig,
+  type HookKind,
+} from "../api/config";
+import { getInjectorStatus, type InjectorStatus } from "../api/injector";
+import { isKsuAvailable } from "../api/ksu";
+import { getModules, type ZnnModule } from "../api/modules";
+import { getSystemInfo, type SystemInfo } from "../api/system";
 
 export interface AppData {
   ksuAvailable: boolean;
@@ -52,28 +57,30 @@ export function useAppData(): AppData {
     loading.value = true;
     const generation = configGeneration;
     try {
-      const [nextStatus, nextSystem, nextModules, nextConfig] = await Promise.all([
-        getInjectorStatus().catch((e) => {
-          console.warn('[znn] status:', e);
-          return null;
-        }),
-        getSystemInfo().catch((e) => {
-          console.warn('[znn] system:', e);
-          return null;
-        }),
-        getModules().catch((e) => {
-          console.warn('[znn] modules:', e);
-          return null;
-        }),
-        getHookConfig().catch((e) => {
-          console.warn('[znn] config:', e);
-          return null;
-        }),
-      ]);
+      const [nextStatus, nextSystem, nextModules, nextConfig] =
+        await Promise.all([
+          getInjectorStatus().catch((e) => {
+            console.warn("[znn] status:", e);
+            return null;
+          }),
+          getSystemInfo().catch((e) => {
+            console.warn("[znn] system:", e);
+            return null;
+          }),
+          getModules().catch((e) => {
+            console.warn("[znn] modules:", e);
+            return null;
+          }),
+          getHookConfig().catch((e) => {
+            console.warn("[znn] config:", e);
+            return null;
+          }),
+        ]);
       if (nextStatus !== null) status.value = nextStatus;
       if (nextSystem !== null) system.value = nextSystem;
       if (nextModules !== null) modules.value = nextModules;
-      if (generation === configGeneration && nextConfig !== null) config.value = nextConfig;
+      if (generation === configGeneration && nextConfig !== null)
+        config.value = nextConfig;
     } finally {
       loading.value = false;
       inFlight = false;
@@ -90,5 +97,14 @@ export function useAppData(): AppData {
     }
   }
 
-  return { ksuAvailable, status, system, modules, config, loading, load, applyHookConfig };
+  return {
+    ksuAvailable,
+    status,
+    system,
+    modules,
+    config,
+    loading,
+    load,
+    applyHookConfig,
+  };
 }

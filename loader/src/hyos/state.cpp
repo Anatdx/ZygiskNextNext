@@ -24,8 +24,8 @@ namespace {
 
 State g_state;
 
-}  //namespace
+}  // namespace
 
 State& state() { return g_state; }
 
-}  //namespace znn::hyos
+}  // namespace znn::hyos

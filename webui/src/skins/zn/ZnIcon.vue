@@ -18,11 +18,13 @@
  * Copyright (C) 2026 VeryBaaad <verybaad@outlook.com>
  */
 
-import { computed } from 'vue';
+import { computed } from "vue";
 
-import { resolveIcon, type IconName } from './icons';
+import { resolveIcon, type IconName } from "./icons";
 
-const props = withDefaults(defineProps<{ name: IconName; size?: number }>(), { size: 16 });
+const props = withDefaults(defineProps<{ name: IconName; size?: number }>(), {
+  size: 16,
+});
 
 const spec = computed(() => resolveIcon(props.name));
 </script>
@@ -42,6 +44,12 @@ const spec = computed(() => resolveIcon(props.name));
     focusable="false"
   >
     <path v-for="d in spec.strokes" :key="d" :d="d" />
-    <path v-for="d in spec.fills" :key="d" :d="d" fill="currentColor" stroke="none" />
+    <path
+      v-for="d in spec.fills"
+      :key="d"
+      :d="d"
+      fill="currentColor"
+      stroke="none"
+    />
   </svg>
 </template>

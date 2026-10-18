@@ -18,25 +18,25 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { MiuixCard, MiuixIcon, MiuixText } from 'miuix-vue';
-import { computed } from 'vue';
+import { MiuixCard, MiuixIcon, MiuixText } from "miuix-vue";
+import { computed } from "vue";
 
-import { VER_NAME } from '../../app-info';
-import type { InjectorStatus } from '../../api/injector';
-import { t } from '../../i18n';
-import { CHECK_CIRCLE, ERROR_CIRCLE, GLYPH_VIEW_BOX } from './glyphs';
+import { VER_NAME } from "../../app-info";
+import type { InjectorStatus } from "../../api/injector";
+import { t } from "../../i18n";
+import { CHECK_CIRCLE, ERROR_CIRCLE, GLYPH_VIEW_BOX } from "./glyphs";
 
 const props = defineProps<{ status: InjectorStatus }>();
 
 const active = computed(() => props.status.running);
 
 const mode = computed(() => {
-  if (!props.status.running) return '';
-  if (props.status.mode === 'kernel') return t('config.mode.kernel');
-  if (props.status.mode === 'proc') return t('config.mode.proc');
-  if (props.status.mode === 'ptrace') return t('config.mode.ptrace');
-  if (props.status.mode === 'late') return t('config.mode.late');
-  return '';
+  if (!props.status.running) return "";
+  if (props.status.mode === "kernel") return t("config.mode.kernel");
+  if (props.status.mode === "proc") return t("config.mode.proc");
+  if (props.status.mode === "ptrace") return t("config.mode.ptrace");
+  if (props.status.mode === "late") return t("config.mode.late");
+  return "";
 });
 </script>
 
@@ -61,7 +61,7 @@ const mode = computed(() => {
       </span>
       <div class="miuix-status-head">
         <MiuixText :size="22" weight="semibold">
-          {{ t(active ? 'status.active' : 'status.inactive') }}
+          {{ t(active ? "status.active" : "status.inactive") }}
         </MiuixText>
         <MiuixText :size="15">{{ VER_NAME }}</MiuixText>
       </div>

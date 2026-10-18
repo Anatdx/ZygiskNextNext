@@ -27,8 +27,8 @@
 namespace znn::debugdata {
 
 enum class Backend {
-    kLzma,
-    kXz,
+  kLzma,
+  kXz,
 };
 
 Backend backend();
@@ -41,4 +41,4 @@ const char* backendName(Backend backend);
 
 bool decompress(const uint8_t* data, size_t size, std::vector<uint8_t>& out);
 
-}  //namespace znn::debugdata
+}  // namespace znn::debugdata

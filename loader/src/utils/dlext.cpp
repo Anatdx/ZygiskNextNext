@@ -19,11 +19,11 @@
 
 #include "utils/dlext.h"
 
-#include "log.h"
-#include "utils/elf_util.h"
-
 #include <android/dlext.h>
 #include <dlfcn.h>
+
+#include "log.h"
+#include "utils/elf_util.h"
 
 namespace znn {
 namespace {
@@ -31,30 +31,31 @@ namespace {
 using DlopenExtFn = void* (*)(const char*, int, const android_dlextinfo*);
 
 DlopenExtFn resolveDlopenExt() {
-    const char* linkers[] = {"linker64", "linker"};
-    for (const char* linker : linkers) {
-        const uintptr_t address = resolveLibrarySymbol(linker, "__loader_android_dlopen_ext");
-        if (address != 0) return reinterpret_cast<DlopenExtFn>(address);
-    }
-    if (void* symbol = dlsym(RTLD_DEFAULT, "android_dlopen_ext")) {
-        return reinterpret_cast<DlopenExtFn>(symbol);
-    }
-    return nullptr;
+  const char* linkers[] = {"linker64", "linker"};
+  for (const char* linker : linkers) {
+    const uintptr_t address =
+        resolveLibrarySymbol(linker, "__loader_android_dlopen_ext");
+    if (address != 0) return reinterpret_cast<DlopenExtFn>(address);
+  }
+  if (void* symbol = dlsym(RTLD_DEFAULT, "android_dlopen_ext")) {
+    return reinterpret_cast<DlopenExtFn>(symbol);
+  }
+  return nullptr;
 }
 
-}  //namespace
+}  // namespace
 
 void* dlopenFd(int fd, const char* name, int flags) {
-    const DlopenExtFn dlopen_ext = resolveDlopenExt();
-    if (!dlopen_ext) {
-        LOGE("dlopen %s: this process has no android_dlopen_ext", name);
-        return nullptr;
-    }
+  const DlopenExtFn dlopen_ext = resolveDlopenExt();
+  if (!dlopen_ext) {
+    LOGE("dlopen %s: this process has no android_dlopen_ext", name);
+    return nullptr;
+  }
 
-    android_dlextinfo ext = {};
-    ext.flags = ANDROID_DLEXT_USE_LIBRARY_FD;
-    ext.library_fd = fd;
-    return dlopen_ext(name, flags, &ext);
+  android_dlextinfo ext = {};
+  ext.flags = ANDROID_DLEXT_USE_LIBRARY_FD;
+  ext.library_fd = fd;
+  return dlopen_ext(name, flags, &ext);
 }
 
-}  //namespace znn
+}  // namespace znn

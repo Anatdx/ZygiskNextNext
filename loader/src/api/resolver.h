@@ -22,5 +22,5 @@
 #include "utils/elf_util.h"
 
 struct ZnSymbolResolver {
-    znn::ElfImage* image = nullptr;
+  znn::ElfImage* image = nullptr;
 };

@@ -17,18 +17,18 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import type { HookConfig, HookKind } from './api/config';
-import { t } from './i18n';
+import type { HookConfig, HookKind } from "./api/config";
+import { t } from "./i18n";
 
 export const ENGINE_LABELS: Record<string, string> = {
-  dobby: 'Dobby',
-  shadowhook: 'ShadowHook',
-  rv64hook: 'rv64hook',
-  and64inlinehook: 'And64InlineHook',
-  lsplt: 'LSPlt',
-  bytehook: 'ByteHook',
-  xhook: 'xHook',
-  plti: 'PLTI',
+  dobby: "Dobby",
+  shadowhook: "ShadowHook",
+  rv64hook: "rv64hook",
+  and64inlinehook: "And64InlineHook",
+  lsplt: "LSPlt",
+  bytehook: "ByteHook",
+  xhook: "xHook",
+  plti: "PLTI",
   disable: t(`config.disable`),
 };
 
@@ -39,32 +39,32 @@ export interface HookRow {
 }
 
 export const HOOK_ROWS: HookRow[] = [
-  { kind: 'inline', field: 'inlineHook', labelKey: 'config.inlineHook' },
-  { kind: 'plt', field: 'pltHook', labelKey: 'config.pltHook' },
-  { kind: 'mode', field: 'mode', labelKey: 'config.mode' },
-  { kind: 'debugdata', field: 'debugdata', labelKey: 'config.debugdata' },
-  { kind: 'disable-zn', field: 'disableZn', labelKey: 'config.disableZn' },
+  { kind: "inline", field: "inlineHook", labelKey: "config.inlineHook" },
+  { kind: "plt", field: "pltHook", labelKey: "config.pltHook" },
+  { kind: "mode", field: "mode", labelKey: "config.mode" },
+  { kind: "debugdata", field: "debugdata", labelKey: "config.debugdata" },
+  { kind: "disable-zn", field: "disableZn", labelKey: "config.disableZn" },
 ];
 
-export const UI_ROW_LABEL_KEY = 'config.uiStyle';
+export const UI_ROW_LABEL_KEY = "config.uiStyle";
 
 export function configRows<T>(map: (row: HookRow) => T, uiRow: T): T[] {
-  const bottom = HOOK_ROWS.filter((row) => row.kind === 'disable-zn');
-  const rows = HOOK_ROWS.filter((row) => row.kind !== 'disable-zn').map(map);
+  const bottom = HOOK_ROWS.filter((row) => row.kind === "disable-zn");
+  const rows = HOOK_ROWS.filter((row) => row.kind !== "disable-zn").map(map);
   rows.push(uiRow);
   rows.push(...bottom.map(map));
   return rows;
 }
 
 export function hookOptionLabel(kind: HookKind, id: string): string {
-  if (kind === 'mode') return t(`config.mode.${id}`);
-  if (kind === 'debugdata') return t(`config.debugdata.${id}`);
-  if (kind === 'disable-zn') return t(`config.disableZn.${id}`);
+  if (kind === "mode") return t(`config.mode.${id}`);
+  if (kind === "debugdata") return t(`config.debugdata.${id}`);
+  if (kind === "disable-zn") return t(`config.disableZn.${id}`);
   return ENGINE_LABELS[id] ?? id;
 }
 
 export function uiModeLabel(mode: string): string {
-  if (mode === 'miuix') return t('ui.miuix');
-  if (mode === 'zn') return t('ui.zn');
-  return t('ui.material');
+  if (mode === "miuix") return t("ui.miuix");
+  if (mode === "zn") return t("ui.zn");
+  return t("ui.material");
 }

@@ -19,13 +19,13 @@
 
 #pragma once
 
-#include "zygisk_next_api.h"
-
 #include <pthread.h>
 #include <sys/types.h>
 
 #include <atomic>
 #include <cstdint>
+
+#include "zygisk_next_api.h"
 
 namespace znn::hyos {
 
@@ -36,34 +36,34 @@ constexpr int kNameWriting = 1;
 constexpr int kNameReady = 2;
 
 using ForkFn = pid_t (*)();
-using SetcontextFn = int (*)(uid_t uid, int is_system_server, const char* se_info,
-                             const char* pkg_name);
+using SetcontextFn = int (*)(uid_t uid, int is_system_server,
+                             const char* se_info, const char* pkg_name);
 using SetnameFn = int (*)(pthread_t thread, const char* name);
 
 struct SpawnerImage {
-    dev_t dev = 0;
-    ino_t inode = 0;
-    uintptr_t base = 0;
+  dev_t dev = 0;
+  ino_t inode = 0;
+  uintptr_t base = 0;
 };
 
-//forked children inherit
+// forked children inherit
 struct State {
-    bool active = false;
-    ZygiskNextHyosModule modules[kMaxModules] = {};
-    int module_count = 0;
-    bool in_child = false;
-    std::atomic<bool> fired{false};  //delivered already, once
-    bool warned = false;
-    bool plt_fork_tried = false;
-    bool plt_ctx_tried = false;
-    ForkFn orig_fork = nullptr;
-    SetcontextFn orig_setcontext = nullptr;
-    SetnameFn orig_setname = nullptr;
-    SpawnerImage spawner{};
-    char captured_name[256] = {};
-    std::atomic<int> name_state{kNameEmpty};
+  bool active = false;
+  ZygiskNextHyosModule modules[kMaxModules] = {};
+  int module_count = 0;
+  bool in_child = false;
+  std::atomic<bool> fired{false};  // delivered already, once
+  bool warned = false;
+  bool plt_fork_tried = false;
+  bool plt_ctx_tried = false;
+  ForkFn orig_fork = nullptr;
+  SetcontextFn orig_setcontext = nullptr;
+  SetnameFn orig_setname = nullptr;
+  SpawnerImage spawner{};
+  char captured_name[256] = {};
+  std::atomic<int> name_state{kNameEmpty};
 };
 
 State& state();
 
-}  //namespace znn::hyos
+}  // namespace znn::hyos

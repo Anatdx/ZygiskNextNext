@@ -17,7 +17,7 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { apiBinary, execJson } from './ksu';
+import { apiBinary, execJson } from "./ksu";
 
 export interface InjectorStatus {
   running: boolean;
@@ -32,8 +32,8 @@ export async function getInjectorStatus(): Promise<InjectorStatus> {
     mode?: string;
   }>(`${apiBinary()} --ctl status`);
   return {
-    pid: typeof raw.pid === 'number' ? raw.pid : 0,
-    mode: typeof raw.mode === 'string' ? raw.mode : undefined,
-    running: raw.running === true || raw.running === 'true',
+    pid: typeof raw.pid === "number" ? raw.pid : 0,
+    mode: typeof raw.mode === "string" ? raw.mode : undefined,
+    running: raw.running === true || raw.running === "true",
   };
 }

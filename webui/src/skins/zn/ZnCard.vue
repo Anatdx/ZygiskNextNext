@@ -18,9 +18,11 @@
  * Copyright (C) 2026 VeryBaaad <verybaad@outlook.com>
  */
 
-import ZnIcon from './ZnIcon.vue';
+import ZnIcon from "./ZnIcon.vue";
 
-const props = withDefaults(defineProps<{ title: string; error?: boolean }>(), { error: false });
+const props = withDefaults(defineProps<{ title: string; error?: boolean }>(), {
+  error: false,
+});
 </script>
 
 <template>

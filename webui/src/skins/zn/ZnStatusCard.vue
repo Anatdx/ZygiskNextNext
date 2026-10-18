@@ -18,18 +18,18 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { computed } from 'vue';
+import { computed } from "vue";
 
-import type { InjectorStatus } from '../../api/injector';
-import type { ZnnModule } from '../../api/modules';
-import { cleanVersion, type RootImplementation } from '../../api/system';
-import { useAppActions } from '../../composables/app-actions';
-import { t } from '../../i18n';
-import ZnCard from './ZnCard.vue';
-import ZnCollapse from './ZnCollapse.vue';
-import ZnIcon from './ZnIcon.vue';
-import ZnModuleList from './ZnModuleList.vue';
-import ZnTag from './ZnTag.vue';
+import type { InjectorStatus } from "../../api/injector";
+import type { ZnnModule } from "../../api/modules";
+import { cleanVersion, type RootImplementation } from "../../api/system";
+import { useAppActions } from "../../composables/app-actions";
+import { t } from "../../i18n";
+import ZnCard from "./ZnCard.vue";
+import ZnCollapse from "./ZnCollapse.vue";
+import ZnIcon from "./ZnIcon.vue";
+import ZnModuleList from "./ZnModuleList.vue";
+import ZnTag from "./ZnTag.vue";
 
 const props = defineProps<{
   status: InjectorStatus | null;
@@ -43,21 +43,21 @@ const actions = useAppActions();
 
 const rootLabel = computed(() => {
   const impl = props.root;
-  if (!impl) return t('info.rootImpl.none');
+  if (!impl) return t("info.rootImpl.none");
   const entries = [
-    { name: 'KernelSU', version: cleanVersion(impl.kernelSU) },
-    { name: 'Magisk', version: cleanVersion(impl.magisk) },
-    { name: 'APatch', version: cleanVersion(impl.apatch) },
+    { name: "KernelSU", version: cleanVersion(impl.kernelSU) },
+    { name: "Magisk", version: cleanVersion(impl.magisk) },
+    { name: "APatch", version: cleanVersion(impl.apatch) },
   ].filter((entry) => entry.version !== null);
-  if (entries.length === 0) return t('info.rootImpl.none');
-  return entries.map((entry) => `${entry.name} (${entry.version})`).join(', ');
+  if (entries.length === 0) return t("info.rootImpl.none");
+  return entries.map((entry) => `${entry.name} (${entry.version})`).join(", ");
 });
 
 const injectorLabel = computed(() => {
-  if (!props.status?.running) return t('zn.stopped');
+  if (!props.status?.running) return t("zn.stopped");
   return props.status.pid
-    ? `${t('zn.running')} (${props.status.pid})`
-    : t('zn.running');
+    ? `${t("zn.running")} (${props.status.pid})`
+    : t("zn.running");
 });
 </script>
 
@@ -78,13 +78,15 @@ const injectorLabel = computed(() => {
 
     <div class="zn-rows">
       <div class="zn-row">
-        <span class="zn-field-label">{{ t('info.rootImpl') }}</span>
+        <span class="zn-field-label">{{ t("info.rootImpl") }}</span>
         <ZnTag :tone="props.root ? 'ok' : 'warn'">{{ rootLabel }}</ZnTag>
       </div>
 
       <div class="zn-row">
-        <span class="zn-field-label">{{ t('zn.injector') }}</span>
-        <ZnTag :tone="props.status?.running ? 'ok' : 'warn'">{{ injectorLabel }}</ZnTag>
+        <span class="zn-field-label">{{ t("zn.injector") }}</span>
+        <ZnTag :tone="props.status?.running ? 'ok' : 'warn'">{{
+          injectorLabel
+        }}</ZnTag>
       </div>
     </div>
 

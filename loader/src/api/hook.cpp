@@ -17,17 +17,16 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-#include "api/api.h"
-
-#include "hook/inline.h"
-#include "hook/plt.h"
-#include "log.h"
-#include "utils/elf_util.h"
-
 #include <algorithm>
 #include <mutex>
 #include <set>
 #include <vector>
+
+#include "api/api.h"
+#include "hook/inline.h"
+#include "hook/plt.h"
+#include "log.h"
+#include "utils/elf_util.h"
 
 namespace znn::api {
 namespace {
@@ -36,63 +35,65 @@ std::mutex g_hook_mutex;
 std::set<uintptr_t> g_hooked;
 
 void logUnmappedTarget(uintptr_t target, const std::vector<MapEntry>& maps) {
-    LOGW("inlineHook target %p is not mapped", reinterpret_cast<void*>(target));
-    for (const auto& m : maps) {
-        if (m.path.find("libc.so") == std::string::npos) continue;
-        LOGI("  map %p-%p off=0x%lx %s", reinterpret_cast<void*>(m.start),
-             reinterpret_cast<void*>(m.end), static_cast<unsigned long>(m.offset), m.path.c_str());
-    }
+  LOGW("inlineHook target %p is not mapped", reinterpret_cast<void*>(target));
+  for (const auto& m : maps) {
+    if (m.path.find("libc.so") == std::string::npos) continue;
+    LOGI("  map %p-%p off=0x%lx %s", reinterpret_cast<void*>(m.start),
+         reinterpret_cast<void*>(m.end), static_cast<unsigned long>(m.offset),
+         m.path.c_str());
+  }
 }
 
-}  //namespace
+}  // namespace
 
 int pltHook(void* base, const char* symbol, void* hook, void** original) {
-    if (!base || !symbol || !hook) return ZN_FAILED;
-    return znn::hook::pltHook(base, symbol, hook, original) ? ZN_SUCCESS : ZN_FAILED;
+  if (!base || !symbol || !hook) return ZN_FAILED;
+  return znn::hook::pltHook(base, symbol, hook, original) ? ZN_SUCCESS
+                                                          : ZN_FAILED;
 }
 
 int inlineHook(void* target, void* addr, void** original) {
-    if (!target || !addr) return ZN_FAILED;
+  if (!target || !addr) return ZN_FAILED;
 
-    const uintptr_t t = reinterpret_cast<uintptr_t>(target);
-    const auto maps = znn::parseMaps("self");
-    const auto mapped = std::find_if(maps.begin(), maps.end(), [t](const MapEntry& m) {
-        return t >= m.start && t < m.end;
-    });
-    if (mapped != maps.end()) {
-        LOGI("inlineHook target %p -> %s+0x%lx", reinterpret_cast<void*>(t), mapped->path.c_str(),
-             static_cast<unsigned long>(t - mapped->start));
-    } else {
-        logUnmappedTarget(t, maps);
-    }
+  const uintptr_t t = reinterpret_cast<uintptr_t>(target);
+  const auto maps = znn::parseMaps("self");
+  const auto mapped = std::find_if(
+      maps.begin(), maps.end(),
+      [t](const MapEntry& m) { return t >= m.start && t < m.end; });
+  if (mapped != maps.end()) {
+    LOGI("inlineHook target %p -> %s+0x%lx", reinterpret_cast<void*>(t),
+         mapped->path.c_str(), static_cast<unsigned long>(t - mapped->start));
+  } else {
+    logUnmappedTarget(t, maps);
+  }
 
-    //claim the address before hooking it: two modules racing for the same address
-    //must not both be told they own it
-    {
-        std::lock_guard<std::mutex> lk(g_hook_mutex);
-        if (!g_hooked.insert(t).second) return ZN_FAILED;
-    }
-    if (!znn::hook::inlineHook(target, addr, original)) {
-        std::lock_guard<std::mutex> lk(g_hook_mutex);
-        g_hooked.erase(t);
-        return ZN_FAILED;
-    }
-    return ZN_SUCCESS;
+  // claim the address before hooking it: two modules racing for the same
+  // address must not both be told they own it
+  {
+    std::lock_guard<std::mutex> lk(g_hook_mutex);
+    if (!g_hooked.insert(t).second) return ZN_FAILED;
+  }
+  if (!znn::hook::inlineHook(target, addr, original)) {
+    std::lock_guard<std::mutex> lk(g_hook_mutex);
+    g_hooked.erase(t);
+    return ZN_FAILED;
+  }
+  return ZN_SUCCESS;
 }
 
 int inlineUnhook(void* target) {
-    if (!target) return ZN_FAILED;
+  if (!target) return ZN_FAILED;
 
-    const uintptr_t t = reinterpret_cast<uintptr_t>(target);
-    {
-        std::lock_guard<std::mutex> lk(g_hook_mutex);
-        if (g_hooked.find(t) == g_hooked.end()) return ZN_FAILED;
-    }
-    if (!znn::hook::inlineUnhook(target)) return ZN_FAILED;
-
+  const uintptr_t t = reinterpret_cast<uintptr_t>(target);
+  {
     std::lock_guard<std::mutex> lk(g_hook_mutex);
-    g_hooked.erase(t);
-    return ZN_SUCCESS;
+    if (g_hooked.find(t) == g_hooked.end()) return ZN_FAILED;
+  }
+  if (!znn::hook::inlineUnhook(target)) return ZN_FAILED;
+
+  std::lock_guard<std::mutex> lk(g_hook_mutex);
+  g_hooked.erase(t);
+  return ZN_SUCCESS;
 }
 
-}  //namespace znn::api
+}  // namespace znn::api

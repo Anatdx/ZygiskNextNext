@@ -35,26 +35,26 @@ constexpr size_t kPlanMaxBytes = 32 * 1024;
 constexpr size_t kChannelNameMax = 96;
 
 struct PlanString {
-    uint32_t offset;
-    uint32_t length;
+  uint32_t offset;
+  uint32_t length;
 };
 
 struct PlanModule {
-    int32_t fd;
-    uint32_t flags;
-    uint32_t index;
-    PlanString path;
+  int32_t fd;
+  uint32_t flags;
+  uint32_t index;
+  PlanString path;
 };
 
 struct Plan {
-    uint32_t magic;
-    uint32_t version;
-    uint32_t size;
-    uint32_t module_count;
-    uint32_t nonce;
-    PlanString inline_engine;
-    PlanString plt_engine;
-    PlanString debugdata;
+  uint32_t magic;
+  uint32_t version;
+  uint32_t size;
+  uint32_t module_count;
+  uint32_t nonce;
+  PlanString inline_engine;
+  PlanString plt_engine;
+  PlanString debugdata;
 };
 
 constexpr size_t kPlanHeaderSize = sizeof(Plan);
@@ -65,4 +65,4 @@ static_assert(kPlanModuleSize == 20, "a boot plan module must stay 20 bytes");
 
 size_t channelName(uint32_t nonce, uint32_t index, char* out);
 
-}  //namespace znn::ipc
+}  // namespace znn::ipc

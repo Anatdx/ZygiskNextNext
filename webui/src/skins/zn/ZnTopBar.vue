@@ -18,29 +18,41 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { useTemplateRef } from 'vue';
+import { useTemplateRef } from "vue";
 
-import { MODULE_NAME } from '../../app-info';
-import { LOCALE_LABELS, LOCALES, locale, setLocale, t, type Locale } from '../../i18n';
-import { THEME_MODES, setThemeMode, themeMode, type ThemeMode } from '../../theme';
-import ZnIcon from './ZnIcon.vue';
-import type { IconName } from './icons';
-import { usePopover } from './use-popover';
+import { MODULE_NAME } from "../../app-info";
+import {
+  LOCALE_LABELS,
+  LOCALES,
+  locale,
+  setLocale,
+  t,
+  type Locale,
+} from "../../i18n";
+import {
+  THEME_MODES,
+  setThemeMode,
+  themeMode,
+  type ThemeMode,
+} from "../../theme";
+import ZnIcon from "./ZnIcon.vue";
+import type { IconName } from "./icons";
+import { usePopover } from "./use-popover";
 
 const THEME_ICONS: Record<ThemeMode, IconName> = {
-  auto: 'themeAuto',
-  light: 'themeLight',
-  dark: 'themeDark',
+  auto: "themeAuto",
+  light: "themeLight",
+  dark: "themeDark",
 };
 
 const THEME_LABEL_KEYS: Record<ThemeMode, string> = {
-  auto: 'theme.auto',
-  light: 'theme.light',
-  dark: 'theme.dark',
+  auto: "theme.auto",
+  light: "theme.light",
+  dark: "theme.dark",
 };
 
-const themeRoot = useTemplateRef<HTMLElement>('themeRoot');
-const localeRoot = useTemplateRef<HTMLElement>('localeRoot');
+const themeRoot = useTemplateRef<HTMLElement>("themeRoot");
+const localeRoot = useTemplateRef<HTMLElement>("localeRoot");
 
 const {
   open: themeOpen,
@@ -83,7 +95,12 @@ function pickLocale(next: Locale): void {
         >
           <ZnIcon :name="THEME_ICONS[themeMode]" :size="20" />
         </button>
-        <div v-if="themeOpen" class="zn-menu" :class="{ 'is-above': themeAbove }" role="menu">
+        <div
+          v-if="themeOpen"
+          class="zn-menu"
+          :class="{ 'is-above': themeAbove }"
+          role="menu"
+        >
           <button
             v-for="mode in THEME_MODES"
             :key="mode"
@@ -111,7 +128,12 @@ function pickLocale(next: Locale): void {
         >
           <ZnIcon name="language" :size="20" />
         </button>
-        <div v-if="localeOpen" class="zn-menu" :class="{ 'is-above': localeAbove }" role="menu">
+        <div
+          v-if="localeOpen"
+          class="zn-menu"
+          :class="{ 'is-above': localeAbove }"
+          role="menu"
+        >
           <button
             v-for="item in LOCALES"
             :key="item"

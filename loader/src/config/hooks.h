@@ -23,6 +23,7 @@
 
 namespace znn::config {
 
-void resolveHookEngines(const std::string& inline_name, const std::string& plt_name);
+void resolveHookEngines(const std::string& inline_name,
+                        const std::string& plt_name);
 
-}  //namespace znn::config
+}  // namespace znn::config

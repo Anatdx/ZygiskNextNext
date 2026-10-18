@@ -21,10 +21,10 @@
 
 namespace znn::hyos {
 
-//PLT hooks first, inline fallback
+// PLT hooks first, inline fallback
 void installHooks();
 
 void atForkPrepare();
 void atForkChild();
 
-}  //namespace znn::hyos
+}  // namespace znn::hyos

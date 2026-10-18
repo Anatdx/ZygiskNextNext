@@ -19,11 +19,11 @@
 
 #include "hook/engine.h"
 
-#include "hook/backend.h"
-#include "log.h"
-
 #include <string.h>
 #include <unistd.h>
+
+#include "hook/backend.h"
+#include "log.h"
 
 namespace znn::hook {
 namespace {
@@ -31,136 +31,146 @@ namespace {
 InlineEngine g_inline_engine = defaultInlineEngine();
 PltEngine g_plt_engine = defaultPltEngine();
 
-}  //namespace
+}  // namespace
 
 const char* inlineEngineName(InlineEngine e) {
-    switch (e) {
-        case InlineEngine::kDobby: return "dobby";
-        case InlineEngine::kShadowHook: return "shadowhook";
-        case InlineEngine::kAnd64InlineHook: return "and64inlinehook";
-        case InlineEngine::kRv64Hook: return "rv64hook";
-        case InlineEngine::kDisable: return "disable";
-    }
-    return "unknown";
+  switch (e) {
+    case InlineEngine::kDobby:
+      return "dobby";
+    case InlineEngine::kShadowHook:
+      return "shadowhook";
+    case InlineEngine::kAnd64InlineHook:
+      return "and64inlinehook";
+    case InlineEngine::kRv64Hook:
+      return "rv64hook";
+    case InlineEngine::kDisable:
+      return "disable";
+  }
+  return "unknown";
 }
 
 const char* pltEngineName(PltEngine e) {
-    switch (e) {
-        case PltEngine::kLsplt: return "lsplt";
-        case PltEngine::kByteHook: return "bytehook";
-        case PltEngine::kXHook: return "xhook";
-        case PltEngine::kPlti: return "plti";
-        case PltEngine::kDisable: return "disable";
-    }
-    return "unknown";
+  switch (e) {
+    case PltEngine::kLsplt:
+      return "lsplt";
+    case PltEngine::kByteHook:
+      return "bytehook";
+    case PltEngine::kXHook:
+      return "xhook";
+    case PltEngine::kPlti:
+      return "plti";
+    case PltEngine::kDisable:
+      return "disable";
+  }
+  return "unknown";
 }
 
 bool inlineEngineSupported(InlineEngine e) {
-    switch (e) {
-        case InlineEngine::kDobby:
+  switch (e) {
+    case InlineEngine::kDobby:
 #ifndef __riscv
-            return true;
+      return true;
 #else
-            return false;
+      return false;
 #endif
-        case InlineEngine::kShadowHook:
+    case InlineEngine::kShadowHook:
 #if defined(__aarch64__) || defined(__arm__)
-            return true;
+      return true;
 #else
-            return false;
+      return false;
 #endif
-        case InlineEngine::kAnd64InlineHook:
+    case InlineEngine::kAnd64InlineHook:
 #if defined(__aarch64__)
-            return true;
+      return true;
 #else
-            return false;
+      return false;
 #endif
-        case InlineEngine::kRv64Hook:
+    case InlineEngine::kRv64Hook:
 #ifdef __riscv
-            return true;
+      return true;
 #else
-            return false;
+      return false;
 #endif
-        case InlineEngine::kDisable:
-            return true;
-    }
-    return false;
+    case InlineEngine::kDisable:
+      return true;
+  }
+  return false;
 }
 
 bool pltEngineSupported(PltEngine e) {
-    switch (e) {
-        case PltEngine::kLsplt:
-            return true;
-        case PltEngine::kByteHook:
+  switch (e) {
+    case PltEngine::kLsplt:
+      return true;
+    case PltEngine::kByteHook:
 #ifndef __riscv
-            return true;
+      return true;
 #else
-            return false;
+      return false;
 #endif
-        case PltEngine::kXHook:
+    case PltEngine::kXHook:
 #ifndef __riscv
-            return true;
+      return true;
 #else
-            return false;
+      return false;
 #endif
-        case PltEngine::kPlti:
-            return true;
-        case PltEngine::kDisable:
-            return true;
-    }
-    return false;
+    case PltEngine::kPlti:
+      return true;
+    case PltEngine::kDisable:
+      return true;
+  }
+  return false;
 }
 
 InlineEngine defaultInlineEngine() {
 #ifdef __riscv
-    return InlineEngine::kRv64Hook;
+  return InlineEngine::kRv64Hook;
 #else
-    return InlineEngine::kDobby;
+  return InlineEngine::kDobby;
 #endif
 }
 
 PltEngine defaultPltEngine() { return PltEngine::kLsplt; }
 
 bool parseInlineEngine(const char* name, InlineEngine* out) {
-    if (!name) return false;
-    InlineEngine e;
-    if (strcmp(name, "dobby") == 0) {
-        e = InlineEngine::kDobby;
-    } else if (strcmp(name, "shadowhook") == 0) {
-        e = InlineEngine::kShadowHook;
-    } else if (strcmp(name, "and64inlinehook") == 0) {
-        e = InlineEngine::kAnd64InlineHook;
-    } else if (strcmp(name, "rv64hook") == 0) {
-        e = InlineEngine::kRv64Hook;
-    } else if (strcmp(name, "disable") == 0) {
-        e = InlineEngine::kDisable;
-    } else {
-        return false;
-    }
-    if (!inlineEngineSupported(e)) return false;
-    *out = e;
-    return true;
+  if (!name) return false;
+  InlineEngine e;
+  if (strcmp(name, "dobby") == 0) {
+    e = InlineEngine::kDobby;
+  } else if (strcmp(name, "shadowhook") == 0) {
+    e = InlineEngine::kShadowHook;
+  } else if (strcmp(name, "and64inlinehook") == 0) {
+    e = InlineEngine::kAnd64InlineHook;
+  } else if (strcmp(name, "rv64hook") == 0) {
+    e = InlineEngine::kRv64Hook;
+  } else if (strcmp(name, "disable") == 0) {
+    e = InlineEngine::kDisable;
+  } else {
+    return false;
+  }
+  if (!inlineEngineSupported(e)) return false;
+  *out = e;
+  return true;
 }
 
 bool parsePltEngine(const char* name, PltEngine* out) {
-    if (!name) return false;
-    PltEngine e;
-    if (strcmp(name, "lsplt") == 0) {
-        e = PltEngine::kLsplt;
-    } else if (strcmp(name, "bytehook") == 0) {
-        e = PltEngine::kByteHook;
-    } else if (strcmp(name, "xhook") == 0) {
-        e = PltEngine::kXHook;
-    } else if (strcmp(name, "plti") == 0) {
-        e = PltEngine::kPlti;
-    } else if (strcmp(name, "disable") == 0) {
-        e = PltEngine::kDisable;
-    } else {
-        return false;
-    }
-    if (!pltEngineSupported(e)) return false;
-    *out = e;
-    return true;
+  if (!name) return false;
+  PltEngine e;
+  if (strcmp(name, "lsplt") == 0) {
+    e = PltEngine::kLsplt;
+  } else if (strcmp(name, "bytehook") == 0) {
+    e = PltEngine::kByteHook;
+  } else if (strcmp(name, "xhook") == 0) {
+    e = PltEngine::kXHook;
+  } else if (strcmp(name, "plti") == 0) {
+    e = PltEngine::kPlti;
+  } else if (strcmp(name, "disable") == 0) {
+    e = PltEngine::kDisable;
+  } else {
+    return false;
+  }
+  if (!pltEngineSupported(e)) return false;
+  *out = e;
+  return true;
 }
 
 InlineEngine inlineEngine() { return g_inline_engine; }
@@ -168,29 +178,34 @@ InlineEngine inlineEngine() { return g_inline_engine; }
 PltEngine pltEngine() { return g_plt_engine; }
 
 void setInlineEngine(InlineEngine e) {
-    if (inlineEngineSupported(e)) g_inline_engine = e;
+  if (inlineEngineSupported(e)) g_inline_engine = e;
 }
 
 void setPltEngine(PltEngine e) {
-    if (pltEngineSupported(e)) g_plt_engine = e;
+  if (pltEngineSupported(e)) g_plt_engine = e;
 }
 
 void ensureInlineEngineReady() {
-    if (g_inline_engine != InlineEngine::kShadowHook) return;
-    if (!backend::shadowhookInit()) {
-        const InlineEngine fallback = defaultInlineEngine();
-        LOGE("shadowhook unavailable in pid %d, falling back to inline=%s for this process", getpid(),
-             inlineEngineName(fallback));
-        g_inline_engine = fallback;
-    }
+  if (g_inline_engine != InlineEngine::kShadowHook) return;
+  if (!backend::shadowhookInit()) {
+    const InlineEngine fallback = defaultInlineEngine();
+    LOGE(
+        "shadowhook unavailable in pid %d, falling back to inline=%s for this "
+        "process",
+        getpid(), inlineEngineName(fallback));
+    g_inline_engine = fallback;
+  }
 }
 
 void ensurePltEngineReady() {
-    if (g_plt_engine != PltEngine::kByteHook) return;
-    if (!backend::bytehookInit()) {
-        LOGE("bytehook unavailable in pid %d, falling back to plt=lsplt for this process", getpid());
-        g_plt_engine = PltEngine::kLsplt;
-    }
+  if (g_plt_engine != PltEngine::kByteHook) return;
+  if (!backend::bytehookInit()) {
+    LOGE(
+        "bytehook unavailable in pid %d, falling back to plt=lsplt for this "
+        "process",
+        getpid());
+    g_plt_engine = PltEngine::kLsplt;
+  }
 }
 
-}  //namespace znn::hook
+}  // namespace znn::hook

@@ -17,7 +17,7 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-html[data-znn-ui='miuix'] body {
+html[data-znn-ui="miuix"] body {
   background-color: var(--m-color-background);
   color: var(--m-color-on-background);
 }
@@ -54,7 +54,6 @@ html[data-znn-ui='miuix'] body {
   padding: 0 26px 8px;
   opacity: calc(1 - var(--znn-miuix-large-fade, 0));
 }
-
 
 .znn-miuix .znn-content {
   max-width: var(--znn-column-width);

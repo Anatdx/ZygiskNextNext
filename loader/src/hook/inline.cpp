@@ -25,39 +25,39 @@
 namespace znn::hook {
 
 bool inlineHook(void* target, void* replacement, void** original) {
-    if (!target || !replacement) return false;
-    ensureInlineEngineReady();
-    switch (inlineEngine()) {
-        case InlineEngine::kDobby:
-            return backend::dobbyHook(target, replacement, original);
-        case InlineEngine::kShadowHook:
-            return backend::shadowhookHook(target, replacement, original);
-        case InlineEngine::kAnd64InlineHook:
-            return backend::and64inlinehookHook(target, replacement, original);
-        case InlineEngine::kRv64Hook:
-            return backend::rv64hookHook(target, replacement, original);
-        case InlineEngine::kDisable:
-            return false;
-    }
-    return false;
+  if (!target || !replacement) return false;
+  ensureInlineEngineReady();
+  switch (inlineEngine()) {
+    case InlineEngine::kDobby:
+      return backend::dobbyHook(target, replacement, original);
+    case InlineEngine::kShadowHook:
+      return backend::shadowhookHook(target, replacement, original);
+    case InlineEngine::kAnd64InlineHook:
+      return backend::and64inlinehookHook(target, replacement, original);
+    case InlineEngine::kRv64Hook:
+      return backend::rv64hookHook(target, replacement, original);
+    case InlineEngine::kDisable:
+      return false;
+  }
+  return false;
 }
 
 bool inlineUnhook(void* target) {
-    if (!target) return false;
-    ensureInlineEngineReady();
-    switch (inlineEngine()) {
-        case InlineEngine::kDobby:
-            return backend::dobbyUnhook(target);
-        case InlineEngine::kShadowHook:
-            return backend::shadowhookUnhook(target);
-        case InlineEngine::kAnd64InlineHook:
-            return backend::and64inlinehookUnhook(target);
-        case InlineEngine::kRv64Hook:
-            return backend::rv64hookUnhook(target);
-        case InlineEngine::kDisable:
-            return false;
-    }
-    return false;
+  if (!target) return false;
+  ensureInlineEngineReady();
+  switch (inlineEngine()) {
+    case InlineEngine::kDobby:
+      return backend::dobbyUnhook(target);
+    case InlineEngine::kShadowHook:
+      return backend::shadowhookUnhook(target);
+    case InlineEngine::kAnd64InlineHook:
+      return backend::and64inlinehookUnhook(target);
+    case InlineEngine::kRv64Hook:
+      return backend::rv64hookUnhook(target);
+    case InlineEngine::kDisable:
+      return false;
+  }
+  return false;
 }
 
-}  //namespace znn::hook
+}  // namespace znn::hook

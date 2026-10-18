@@ -18,7 +18,7 @@
  * Copyright (C) 2026 VeryBaaad <verybaad@outlook.com>
  */
 
-import ZnIcon from './ZnIcon.vue';
+import ZnIcon from "./ZnIcon.vue";
 </script>
 
 <template>

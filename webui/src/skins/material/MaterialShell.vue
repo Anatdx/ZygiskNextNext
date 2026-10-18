@@ -18,22 +18,22 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import './elements';
+import "./elements";
 
-import { computed } from 'vue';
+import { computed } from "vue";
 
-import type { HookConfig } from '../../api/config';
-import type { InjectorStatus } from '../../api/injector';
-import type { ZnnModule } from '../../api/modules';
-import type { SystemInfo } from '../../api/system';
-import MaterialConfigCard from './MaterialConfigCard.vue';
-import MaterialEmptyCard from './MaterialEmptyCard.vue';
-import MaterialErrorCard from './MaterialErrorCard.vue';
-import MaterialFooter from './MaterialFooter.vue';
-import MaterialInfoCard from './MaterialInfoCard.vue';
-import MaterialModulesCard from './MaterialModulesCard.vue';
-import MaterialStatusCard from './MaterialStatusCard.vue';
-import MaterialTopBar from './MaterialTopBar.vue';
+import type { HookConfig } from "../../api/config";
+import type { InjectorStatus } from "../../api/injector";
+import type { ZnnModule } from "../../api/modules";
+import type { SystemInfo } from "../../api/system";
+import MaterialConfigCard from "./MaterialConfigCard.vue";
+import MaterialEmptyCard from "./MaterialEmptyCard.vue";
+import MaterialErrorCard from "./MaterialErrorCard.vue";
+import MaterialFooter from "./MaterialFooter.vue";
+import MaterialInfoCard from "./MaterialInfoCard.vue";
+import MaterialModulesCard from "./MaterialModulesCard.vue";
+import MaterialStatusCard from "./MaterialStatusCard.vue";
+import MaterialTopBar from "./MaterialTopBar.vue";
 
 const props = defineProps<{
   ksuAvailable: boolean;
@@ -47,7 +47,11 @@ const props = defineProps<{
 const empty = computed(
   () =>
     !props.ksuAvailable ||
-    (!props.loading && !props.status && !props.system && !props.modules && !props.config),
+    (!props.loading &&
+      !props.status &&
+      !props.system &&
+      !props.modules &&
+      !props.config),
 );
 
 const failed = computed(
@@ -62,11 +66,18 @@ const failed = computed(
 </script>
 
 <template>
-  <MaterialTopBar :ksu-available="props.ksuAvailable" :refreshing="props.loading" />
+  <MaterialTopBar
+    :ksu-available="props.ksuAvailable"
+    :refreshing="props.loading"
+  />
 
   <main class="znn-content">
     <MaterialStatusCard v-if="props.status" :status="props.status" />
-    <MaterialInfoCard v-if="props.system" :system="props.system" :status="props.status" />
+    <MaterialInfoCard
+      v-if="props.system"
+      :system="props.system"
+      :status="props.status"
+    />
     <MaterialConfigCard v-if="props.config" :config="props.config" />
     <MaterialModulesCard v-if="props.modules" :modules="props.modules" />
     <MaterialErrorCard v-if="failed" />

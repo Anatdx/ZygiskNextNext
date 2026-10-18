@@ -39,16 +39,17 @@ bool rv64hookUnhook(void* target);
 bool and64inlinehookHook(void* target, void* replacement, void** original);
 bool and64inlinehookUnhook(void* target);
 
-bool lspltHook(dev_t dev, ino_t inode, const char* symbol, void* replacement, void** original);
-
-bool bytehookInit();
-bool bytehookHook(const std::string& caller_path, const char* symbol, void* replacement,
-                  void** original);
-
-bool xhookHook(const std::string& caller_path, const char* symbol, void* replacement,
+bool lspltHook(dev_t dev, ino_t inode, const char* symbol, void* replacement,
                void** original);
 
-bool pltiHook(const std::string& caller_path, uintptr_t caller_base, const char* symbol,
-              void* replacement, void** original);
+bool bytehookInit();
+bool bytehookHook(const std::string& caller_path, const char* symbol,
+                  void* replacement, void** original);
 
-}  //namespace znn::hook::backend
+bool xhookHook(const std::string& caller_path, const char* symbol,
+               void* replacement, void** original);
+
+bool pltiHook(const std::string& caller_path, uintptr_t caller_base,
+              const char* symbol, void* replacement, void** original);
+
+}  // namespace znn::hook::backend

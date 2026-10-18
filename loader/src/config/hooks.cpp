@@ -24,19 +24,22 @@
 
 namespace znn::config {
 
-void resolveHookEngines(const std::string& inline_name, const std::string& plt_name) {
-    hook::InlineEngine inline_engine = hook::defaultInlineEngine();
-    hook::PltEngine plt_engine = hook::defaultPltEngine();
+void resolveHookEngines(const std::string& inline_name,
+                        const std::string& plt_name) {
+  hook::InlineEngine inline_engine = hook::defaultInlineEngine();
+  hook::PltEngine plt_engine = hook::defaultPltEngine();
 
-    hook::InlineEngine parsed_inline;
-    hook::PltEngine parsed_plt;
-    if (hook::parseInlineEngine(inline_name.c_str(), &parsed_inline)) inline_engine = parsed_inline;
-    if (hook::parsePltEngine(plt_name.c_str(), &parsed_plt)) plt_engine = parsed_plt;
+  hook::InlineEngine parsed_inline;
+  hook::PltEngine parsed_plt;
+  if (hook::parseInlineEngine(inline_name.c_str(), &parsed_inline))
+    inline_engine = parsed_inline;
+  if (hook::parsePltEngine(plt_name.c_str(), &parsed_plt))
+    plt_engine = parsed_plt;
 
-    hook::setInlineEngine(inline_engine);
-    hook::setPltEngine(plt_engine);
-    LOGI("hook engines: inline=%s plt=%s", hook::inlineEngineName(inline_engine),
-         hook::pltEngineName(plt_engine));
+  hook::setInlineEngine(inline_engine);
+  hook::setPltEngine(plt_engine);
+  LOGI("hook engines: inline=%s plt=%s", hook::inlineEngineName(inline_engine),
+       hook::pltEngineName(plt_engine));
 }
 
-}  //namespace znn::config
+}  // namespace znn::config

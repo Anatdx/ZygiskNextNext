@@ -25,13 +25,13 @@
 namespace znn::config {
 
 void resolveDebugDataBackend(const std::string& name) {
-    debugdata::Backend backend = debugdata::backend();
+  debugdata::Backend backend = debugdata::backend();
 
-    debugdata::Backend parsed;
-    if (debugdata::parseBackend(name.c_str(), &parsed)) backend = parsed;
+  debugdata::Backend parsed;
+  if (debugdata::parseBackend(name.c_str(), &parsed)) backend = parsed;
 
-    debugdata::setBackend(backend);
-    LOGI(".gnu_debugdata backend: %s", debugdata::backendName(backend));
+  debugdata::setBackend(backend);
+  LOGI(".gnu_debugdata backend: %s", debugdata::backendName(backend));
 }
 
-}  //namespace znn::config
+}  // namespace znn::config

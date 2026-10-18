@@ -18,15 +18,19 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { MiuixBasicComponent, MiuixCard, MiuixIcon } from 'miuix-vue';
+import { MiuixBasicComponent, MiuixCard, MiuixIcon } from "miuix-vue";
 
-import { t } from '../../i18n';
-import { Info } from './icons';
+import { t } from "../../i18n";
+import { Info } from "./icons";
 </script>
 
 <template>
   <MiuixCard class="miuix-empty-card">
-    <MiuixBasicComponent :title="t('error.title')" title-color="var(--m-color-error)" disabled>
+    <MiuixBasicComponent
+      :title="t('error.title')"
+      title-color="var(--m-color-error)"
+      disabled
+    >
       <template #start>
         <MiuixIcon :icon="Info" :size="24" />
       </template>

@@ -18,13 +18,13 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-import { computed } from 'vue';
+import { computed } from "vue";
 
-import { MODULE_NAME, VER_NAME } from '../../app-info';
-import type { InjectorStatus } from '../../api/injector';
-import type { SystemInfo } from '../../api/system';
-import { t } from '../../i18n';
-import ZnCard from './ZnCard.vue';
+import { MODULE_NAME, VER_NAME } from "../../app-info";
+import type { InjectorStatus } from "../../api/injector";
+import type { SystemInfo } from "../../api/system";
+import { t } from "../../i18n";
+import ZnCard from "./ZnCard.vue";
 
 const props = defineProps<{
   system: SystemInfo;
@@ -38,32 +38,35 @@ interface InfoRow {
 }
 
 const abiText = computed(() => {
-  const primary = (props.system.abi || '').trim();
-  const rest = (props.system.abilist || '')
-    .split(',')
+  const primary = (props.system.abi || "").trim();
+  const rest = (props.system.abilist || "")
+    .split(",")
     .map((value) => value.trim())
     .filter((value) => value.length > 0 && value !== primary);
-  const parts = [primary ? `${primary} (primary)` : t('info.unknown')];
+  const parts = [primary ? `${primary} (primary)` : t("info.unknown")];
   parts.push(...rest);
-  return parts.join(', ');
+  return parts.join(", ");
 });
 
 const modeText = computed(() => {
-  if (!props.status?.running) return t('info.unknown');
+  if (!props.status?.running) return t("info.unknown");
   const mode = props.status?.mode;
-  if (mode === 'kernel') return t('config.mode.kernel');
-  if (mode === 'proc') return t('config.mode.proc');
-  if (mode === 'ptrace') return t('config.mode.ptrace');
-  if (mode === 'late') return t('config.mode.late');
-  return t('info.unknown');
+  if (mode === "kernel") return t("config.mode.kernel");
+  if (mode === "proc") return t("config.mode.proc");
+  if (mode === "ptrace") return t("config.mode.ptrace");
+  if (mode === "late") return t("config.mode.late");
+  return t("info.unknown");
 });
 
 const rows = computed<InfoRow[]>(() => [
   { label: MODULE_NAME, value: VER_NAME },
-  { label: 'Kernel', value: props.system.kernel || t('info.unknown') },
-  { label: 'Android SDK', value: props.system.sdk > 0 ? String(props.system.sdk) : t('info.unknown') },
-  { label: 'ABI', value: abiText.value },
-  { label: t('info.mode'), value: modeText.value },
+  { label: "Kernel", value: props.system.kernel || t("info.unknown") },
+  {
+    label: "Android SDK",
+    value: props.system.sdk > 0 ? String(props.system.sdk) : t("info.unknown"),
+  },
+  { label: "ABI", value: abiText.value },
+  { label: t("info.mode"), value: modeText.value },
 ]);
 </script>
 

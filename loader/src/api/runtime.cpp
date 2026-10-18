@@ -17,20 +17,20 @@
  * Copyright (C) 2026 VeryBaaad <verybaaad@outlook.com>
  */
 
-#include "api/api.h"
-
 #include "hyos/runtime.h"
+
+#include "api/api.h"
 #include "log.h"
 
 namespace znn::api {
 
 const ZygiskNextRuntime* getRuntime() {
-    return hyos::active() ? hyos::runtime() : nullptr;
+  return hyos::active() ? hyos::runtime() : nullptr;
 }
 
 const ZygiskNextRuntime* getRuntimeUnavailable() {
-    LOGE("Runtime API requires module API version >= 4 (getRuntime)");
-    return nullptr;
+  LOGE("Runtime API requires module API version >= 4 (getRuntime)");
+  return nullptr;
 }
 
-}  //namespace znn::api
+}  // namespace znn::api
