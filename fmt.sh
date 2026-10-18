@@ -1,3 +1,4 @@
+shopt -s globstar
 cd injector
 cargo fmt
 cd ..
