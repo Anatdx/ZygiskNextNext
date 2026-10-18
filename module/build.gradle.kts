@@ -125,7 +125,7 @@ androidComponents.onVariants { variant ->
             )
         }
         from("$projectDir/src") {
-            include("customize.sh", "post-fs-data.sh")
+            include("customize.sh", "late-load.sh", "post-fs-data.sh")
             val tokens = mapOf(
                 "DEBUG" to if (buildTypeLowered == "debug") "true" else "false",
                 "MIN_KSU_VERSION" to "$minKsuVersion",
