@@ -104,7 +104,7 @@ androidComponents.onVariants { variant ->
         into(moduleDir)
         from("${rootProject.projectDir}/README.md")
         from("$projectDir/src") {
-            exclude("module.prop", "customize.sh", "post-fs-data.sh", "mazoku")
+            exclude("module.prop", "customize.sh", "late-load.sh", "post-fs-data.sh", "mazoku")
             filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
         }
         // `mazoku` is a binary signature blob and must be copied verbatim.
@@ -217,6 +217,7 @@ androidComponents.onVariants { variant ->
                     val mapping = Utils.FileMapping()
                     mapping.insert("module.prop.orig", "module.prop")
                     mapping.insert("post-fs-data.sh", null)
+                    mapping.insert("late-load.sh", null)
                     mapping.insert("emulated-soft-reboot.sh", null)
                     mapping.insert("sepolicy.rule", null)
                     mapping.insert("mazoku", null)

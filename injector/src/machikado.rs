@@ -29,7 +29,7 @@ const ORG_PUBLIC_KEY: [u8; 32] = [
     104, 121, 88, 173, 152, 219, 116, 71, 200, 239, 190,
 ];
 
-const SIGNED_FILES: [&str; 8] = [
+const SIGNED_FILES: [&str; 9] = [
     "bin/injector",
     "emulated-soft-reboot.sh",
     "lib/libloader.so",
@@ -37,6 +37,7 @@ const SIGNED_FILES: [&str; 8] = [
     "mazoku",
     "module.prop.orig",
     "post-fs-data.sh",
+    "late-load.sh",
     "sepolicy.rule",
 ];
 
