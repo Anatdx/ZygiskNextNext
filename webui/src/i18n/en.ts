@@ -71,6 +71,7 @@ export const en: Record<string, string> = {
   'config.uiStyle': 'UI style',
   'config.saved': 'Saved',
   'config.saveFailed': 'Failed to save configuration',
+  'config.disable': 'Disable',
 
   'ui.material': 'Material',
   'ui.miuix': 'Miuix',

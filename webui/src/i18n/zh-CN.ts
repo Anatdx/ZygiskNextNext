@@ -73,6 +73,7 @@ export const zhCN: Dictionary = {
   'config.uiStyle': '界面样式',
   'config.saved': '已保存',
   'config.saveFailed': '保存失败',
+  'config.disable': '禁用',
 
   'ui.material': 'Material',
   'ui.miuix': 'Miuix',

@@ -69,18 +69,18 @@ pub struct HookConfigReport {
 
 pub fn inline_hook_options() -> Vec<&'static str> {
     match runtime_abi() {
-        "arm64-v8a" => vec!["dobby", "shadowhook", "and64inlinehook"],
-        "armeabi-v7a" => vec!["dobby", "shadowhook"],
-        "riscv64" => vec!["rv64hook"],
-        _ => vec!["dobby"],
+        "arm64-v8a" => vec!["dobby", "shadowhook", "and64inlinehook", "disable"],
+        "armeabi-v7a" => vec!["dobby", "shadowhook", "disable"],
+        "riscv64" => vec!["rv64hook", "disable"],
+        _ => vec!["dobby", "disable"],
     }
 }
 
 pub fn plt_hook_options() -> Vec<&'static str> {
     if runtime_abi() == "riscv64" {
-        vec!["lsplt", "plti"]
+        vec!["lsplt", "plti", "disable"]
     } else {
-        vec!["lsplt", "plti", "bytehook", "xhook"]
+        vec!["lsplt", "plti", "bytehook", "xhook", "disable"]
     }
 }
 
