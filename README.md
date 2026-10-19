@@ -1,4 +1,4 @@
-# Zygisk Next Next
+# ZNNext
 
 A from-scratch, standalone implementation of the **Zygisk Next module**.
 
@@ -6,7 +6,7 @@ A from-scratch, standalone implementation of the **Zygisk Next module**.
 
 A Magisk module that attempts to implement the ZygiskNext API.
 
-> A Zygisk Next module is a valid Magisk module. Starting with version v1.2.0—preview1 after the project went closed-source—ZygiskNext introduced support for "ZygiskNext modules." These provide more convenient interfaces for inline and PLT hooking and even support advanced injection into the HyperOS Runtime. Consequently, I created this open-source Magisk module—named "ZygiskNextNext"—to load those ZygiskNext modules. Note: ZygiskNextNext is not a Zygisk implementation itself; If you need to use Zygisk, you must enable the Zygisk implementation itself, rather than using only ZygiskNextNext.
+> A Zygisk Next module is a valid Magisk module. Starting with version v1.2.0—preview1 after the project went closed-source—ZygiskNext introduced support for "ZygiskNext modules." These provide more convenient interfaces for inline and PLT hooking and even support advanced injection into the HyperOS Runtime. Consequently, I created this open-source Magisk module to load those ZygiskNext modules.
 
 ## Supported Versions
 
@@ -26,14 +26,14 @@ or
 ## Install
 
 1. Install Magisk 26402+ or KernelSU 11425+ or APatch 10700+
-2. [Download](#download) and install ZygiskNextNext in manager
+2. [Download](#download) and install ZNNext in manager
 3. Reboot
 4. Have fun :)
 
 ## Download
 
-- For stable releases, please go to [Github Releases page](https://github.com/VeryBaaad/ZygiskNextNext/releases)
-- For canary build, please check [Github Actions](https://github.com/VeryBaaad/ZygiskNextNext/actions/workflows/ci.yml?query=branch%3Amaster)
+- For stable releases, please go to [Github Releases page](https://github.com/VeryBaaad/ZNNext/releases)
+- For canary build, please check [Github Actions](https://github.com/VeryBaaad/ZNNext/actions/workflows/ci.yml?query=branch%3Amaster)
 
 Note: debug builds are only available in Github Actions.
 
@@ -41,7 +41,7 @@ Note: debug builds are only available in Github Actions.
 
 **Only bug reports from **THE LATEST DEBUG BUILD** will be accepted.**
 
-- GitHub issues: [Issues](https://github.com/VeryBaaad/ZygiskNextNext/issues/)
+- GitHub issues: [Issues](https://github.com/VeryBaaad/ZNNext/issues/)
 
 - (For Chinese speakers) 本项目只接受英语**标题**的issue。如果您不懂英语，请使用[翻译工具](https://www.deepl.com/zh/translator)
 
@@ -74,4 +74,4 @@ Create a Pull Request.
 
 ## License
 
-Zygisk Next Next is licensed under the **GNU General Public License v3 (GPL-3)** (http://www.gnu.org/copyleft/gpl.html).
+ZNNext is licensed under the **GNU General Public License v3 (GPL-3)** (http://www.gnu.org/copyleft/gpl.html).

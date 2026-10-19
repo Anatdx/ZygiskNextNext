@@ -2,12 +2,12 @@
 
 schemaVersion: 1
 id: zygisknextsu
-name: Zygisk Next Next
+name: ZNNext
 summary: A from-scratch, standalone implementation of the Zygisk Next module
 description: README.md
 license: GPL-3.0-only
 homepage: https://baaad.xyz/
-support: https://github.com/VeryBaaad/ZygiskNextNext/issues
+support: https://github.com/VeryBaaad/ZNNext/issues
 tags: [system]
 metamodule: false
 
@@ -20,4 +20,4 @@ compatibility:
   architectures: [arm64-v8a, armeabi-v7a, x86_64, x86, riscv64]
 
 release:
-  assetPattern: "Zygisk-Next-Next-v*-release.zip"
+  assetPattern: "ZNNext-v*-release.zip"
