@@ -2,6 +2,11 @@
 
 A from-scratch, standalone implementation of the **Zygisk Next module**.
 
+> [!IMPORTANT]
+> ZNNext is not a **Zygisk** implementation
+> 
+> ZNNext 不是一个 **Zygisk** 实现
+
 ## Introduction
 
 A Magisk module that attempts to implement the ZygiskNext API.
