@@ -48,8 +48,6 @@ Note: debug builds are only available in Github Actions.
 
 - GitHub issues: [Issues](https://github.com/VeryBaaad/ZNNext/issues/)
 
-- (For Chinese speakers) 本项目只接受英语**标题**的issue。如果您不懂英语，请使用[翻译工具](https://www.deepl.com/zh/translator)
-
 ## For Developers
 
 Read the [ZygiskNextModuleSample](https://github.com/5ec1cff/ZygiskNextModuleSample)
