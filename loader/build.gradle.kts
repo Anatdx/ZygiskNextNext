@@ -6,6 +6,10 @@ plugins {
 val defaultCFlags: Array<String> = rootProject.extra["defaultCFlags"] as Array<String>
 
 @Suppress("UNCHECKED_CAST")
+val debugFlags: Array<String> = rootProject.extra["debugCFlags"] as Array<String>
+val debugLinkerFlags: String = rootProject.extra["debugLinkerFlags"] as String
+
+@Suppress("UNCHECKED_CAST")
 val releaseFlags: Array<String> = rootProject.extra["releaseCFlags"] as Array<String>
 val releaseLinkerFlags: String = rootProject.extra["releaseLinkerFlags"] as String
 val ccachePath: String? = rootProject.extra["ccachePath"] as String?
@@ -43,10 +47,22 @@ android {
     }
 
     buildTypes {
+        debug {
+            externalNativeBuild.cmake {
+                cFlags += debugFlags
+                cppFlags += debugFlags
+                arguments += "-DCMAKE_C_FLAGS_DEBUG=-Os -g"
+                arguments += "-DCMAKE_CXX_FLAGS_DEBUG=-Os -g"
+                arguments += "-DCMAKE_SHARED_LINKER_FLAGS=$debugLinkerFlags"
+                arguments += "-DCMAKE_EXE_LINKER_FLAGS=$debugLinkerFlags"
+            }
+        }
         release {
             externalNativeBuild.cmake {
                 cFlags += releaseFlags
                 cppFlags += releaseFlags
+                arguments += "-DCMAKE_C_FLAGS_RELWITHDEBINFO=-Oz -g -DNDEBUG"
+                arguments += "-DCMAKE_CXX_FLAGS_RELWITHDEBINFO=-Oz -g -DNDEBUG"
                 arguments += "-DCMAKE_SHARED_LINKER_FLAGS=$releaseLinkerFlags"
                 arguments += "-DCMAKE_EXE_LINKER_FLAGS=$releaseLinkerFlags"
             }

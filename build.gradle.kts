@@ -55,14 +55,19 @@ val defaultCFlags = arrayOf(
     "-Wno-builtin-macro-redefined", "-D__FILE__=__FILE_NAME__"
 )
 
-val releaseCFlags = arrayOf(
-    "-Oz", "-flto",
+val optimizedCFlags = arrayOf(
+    "-flto",
     "-Wno-unused", "-Wno-unused-parameter",
     "-fvisibility=hidden", "-fvisibility-inlines-hidden",
     "-fno-unwind-tables", "-fno-asynchronous-unwind-tables",
 )
 
-val releaseLinkerFlags = "-Wl,--exclude-libs,ALL -Wl,--gc-sections -Wl,--strip-all"
+val debugCFlags = arrayOf("-Os", *optimizedCFlags)
+val releaseCFlags = arrayOf("-Oz", *optimizedCFlags)
+
+val commonLinkerFlags = "-Wl,--exclude-libs,ALL -Wl,--gc-sections -Wl,--icf=safe"
+val debugLinkerFlags = "-Os $commonLinkerFlags"
+val releaseLinkerFlags = "-Oz $commonLinkerFlags -Wl,--strip-all"
 
 // ccache is used whenever it is available on PATH, or through -Pccache.path=...
 val ccachePath: String? = run {
@@ -75,6 +80,8 @@ val ccachePath: String? = run {
 }
 
 extra.set("defaultCFlags", defaultCFlags)
+extra.set("debugCFlags", debugCFlags)
+extra.set("debugLinkerFlags", debugLinkerFlags)
 extra.set("releaseCFlags", releaseCFlags)
 extra.set("releaseLinkerFlags", releaseLinkerFlags)
 extra.set("ccachePath", ccachePath)
