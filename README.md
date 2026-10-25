@@ -74,6 +74,7 @@ Create a Pull Request.
 - [LSPlt](https://github.com/LSPosed/LSPlt), [ByteHook](https://github.com/bytedance/bhook), [xHook](https://github.com/iqiyi/xHook), [PLTI](https://github.com/PerformanC/PLTI), [PLTHook](https://github.com/metacall/plthook) and [UrHook](https://github.com/SMlc666/urhook): used for plt hooking
 - [libcxx](https://github.com/LSPosed/prefab-libcxx): libc++/libc++abi statically linked into the loader
 - [LZMA SDK](https://www.7-zip.org/sdk.html) and [xz-embedded](https://github.com/tukaani-project/xz-embedded): `.gnu_debugdata` decompressor
+- [KernelPatch](https://github.com/bmax121/KernelPatch): for KernelPatch Module
 
 ## License
 
