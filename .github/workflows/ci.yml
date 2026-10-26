@@ -1,16 +1,13 @@
 name: CI
-
 on:
   workflow_dispatch:
   push:
-    branches: [ master ]
-    tags: [ v*.*.* ]
+    branches: [master]
+    tags: [v*.*.*]
   pull_request:
   merge_group:
-
 permissions:
   contents: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,43 +16,36 @@ jobs:
       CCACHE_NOHASHDIR: "true"
       CCACHE_HARDLINK: "true"
       CCACHE_BASEDIR: "${{ github.workspace }}"
-
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
           submodules: "recursive"
           fetch-depth: 0
-
       - name: Write key
         if: ${{ ( github.event_name != 'pull_request' && github.ref == 'refs/heads/master' ) || github.ref_type == 'tag' }}
         run: |
           if [ ! -z "${{ secrets.PRIVATE_KEY }}" ]; then
             echo '${{ secrets.PRIVATE_KEY }}' | base64 --decode > module/private_key
           fi
-
       - name: Setup Java
         uses: actions/setup-java@v6
         with:
           distribution: "temurin"
           java-version: "21"
-
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
           log-accepted-android-sdk-licenses: 'false'
           packages: ''
-
       - name: Setup Android NDK
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r30
           add-to-path: true
           local-cache: ${{ github.event_name == 'push' }}
-
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
-
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
@@ -63,17 +53,14 @@ jobs:
           key: ${{ runner.os }}
           restore-keys: ${{ runner.os }}
           save: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: nightly
           targets: aarch64-linux-android, armv7-linux-androideabi, x86_64-linux-android, i686-linux-android
           components: rust-src
-
       - name: Install cargo-ndk
         run: cargo install cargo-ndk --locked
-
       - name: Build with Gradle
         run: |
           echo 'org.gradle.parallel=true' >> gradle.properties
@@ -83,7 +70,6 @@ jobs:
           sed -i 's/org.gradle.unsafe.configuration-cache=true//g' gradle.properties
           ./gradlew zipRelease
           ./gradlew zipDebug
-
       - name: Prepare artifact
         if: success()
         id: prepareArtifact
@@ -92,7 +78,6 @@ jobs:
           debugName=`ls module/build/outputs/release/ZNNext-v*-debug.zip | awk -F '(/|.zip)' '{print $5}'` && echo "debugName=$debugName" >> $GITHUB_OUTPUT
           7z x -y -oznn-release module/build/outputs/release/ZNNext-v*-release.zip
           7z x -y -oznn-debug module/build/outputs/release/ZNNext-v*-debug.zip
-
       - name: Post to channel
         if: ${{ success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master' && github.ref_type != 'tag' }}
         env:
@@ -109,7 +94,6 @@ jobs:
             URL=$(python3 .github/scripts/telegram_url.py)
             curl -v "$URL" -F Release="@$Release" -F Debug="@$Debug"
           fi
-
       - name: Generate changelog
         if: github.ref_type == 'tag'
         env:
@@ -118,7 +102,6 @@ jobs:
           gh api "repos/${{ github.repository }}/releases/generate-notes" \
             -f tag_name="${{ github.ref_name }}" --jq .body > "${{ runner.temp }}/changelog.md"
           cat "${{ runner.temp }}/changelog.md"
-
       - name: Create Release
         uses: softprops/action-gh-release@v3
         if: github.ref_type == 'tag'
@@ -129,21 +112,18 @@ jobs:
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Upload release
         uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.prepareArtifact.outputs.releaseName }}
           path: "./znn-release/*"
           compression-level: 9
-
       - name: Upload debug
         uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.prepareArtifact.outputs.debugName }}
           path: "./znn-debug/*"
           compression-level: 9
-
       - name: Sync update branch
         if: github.ref_type == 'tag'
         env:

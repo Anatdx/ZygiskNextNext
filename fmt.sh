@@ -1,4 +1,10 @@
 shopt -s globstar
+
+cd .github
+$(go env GOBIN)/yamlfmt .
+cd ..
+$(go env GOBIN)/yamlfmt module.yaml
+
 cd injector
 cargo fmt
 cd ..
