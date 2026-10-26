@@ -22,3 +22,5 @@ cd kpm
 git ls-files | grep -E "\.(cpp|h|hpp|c)$" | xargs clang-format -style=Google -i
 git restore external
 cd ..
+
+git ls-files -z "*.sh" | xargs -0 shfmt -w -i 2 -ci -s

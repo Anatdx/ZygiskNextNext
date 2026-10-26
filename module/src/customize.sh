@@ -16,19 +16,19 @@ if [ "$BOOTMODE" ] && [ "$KSU" ]; then
     ui_print "*********************************************************"
     ui_print "! KernelSU version is too old!"
     ui_print "! Please update KernelSU to latest version"
-    abort    "*********************************************************"
+    abort "*********************************************************"
   fi
   if ! [ "$KSU_VER_CODE" ] || [ "$KSU_VER_CODE" -lt "$MIN_KSUD_VERSION" ]; then
     ui_print "*********************************************************"
     ui_print "! ksud version is too old!"
     ui_print "! Please update KernelSU Manager to latest version"
-    abort    "*********************************************************"
+    abort "*********************************************************"
   fi
   if [ "$(which magisk)" ]; then
     ui_print "*********************************************************"
     ui_print "! Multiple root implementation is NOT supported!"
     ui_print "! Please uninstall Magisk before installing ZNNext"
-    abort    "*********************************************************"
+    abort "*********************************************************"
   fi
 elif [ "$BOOTMODE" ] && [ "$APATCH" ]; then
   ui_print "- Installing from APatch app"
@@ -36,7 +36,7 @@ elif [ "$BOOTMODE" ] && [ "$APATCH" ]; then
     ui_print "*********************************************************"
     ui_print "! Apatch version is too old!"
     ui_print "! Please update Apatch to latest version"
-    abort    "*********************************************************"
+    abort "*********************************************************"
   fi
 elif [ "$BOOTMODE" ] && [ "$MAGISK_VER_CODE" ]; then
   ui_print "- Installing from Magisk app"
@@ -44,13 +44,13 @@ elif [ "$BOOTMODE" ] && [ "$MAGISK_VER_CODE" ]; then
     ui_print "*********************************************************"
     ui_print "! Magisk version is too old!"
     ui_print "! Please update Magisk to latest version"
-    abort    "*********************************************************"
+    abort "*********************************************************"
   fi
 else
   ui_print "*********************************************************"
   ui_print "! Install from recovery is not supported"
   ui_print "! Please install from KernelSU or Magisk app"
-  abort    "*********************************************************"
+  abort "*********************************************************"
 fi
 
 VERSION=$(grep_prop version "${TMPDIR}/module.prop")
@@ -77,11 +77,11 @@ if [ ! -f "$TMPDIR/verify.sh" ]; then
   ui_print "*********************************************************"
   ui_print "! Unable to extract verify.sh!"
   ui_print "! This zip may be corrupted, please try downloading again"
-  abort    "*********************************************************"
+  abort "*********************************************************"
 fi
 . "$TMPDIR/verify.sh"
-extract "$ZIPFILE" 'customize.sh'  "$TMPDIR/.vunzip"
-extract "$ZIPFILE" 'verify.sh'     "$TMPDIR/.vunzip"
+extract "$ZIPFILE" 'customize.sh' "$TMPDIR/.vunzip"
+extract "$ZIPFILE" 'verify.sh' "$TMPDIR/.vunzip"
 extract "$ZIPFILE" 'sepolicy.rule' "$TMPDIR"
 
 if [ "$KSU" ]; then
@@ -89,20 +89,20 @@ if [ "$KSU" ]; then
   if ! check_sepolicy "$TMPDIR/sepolicy.rule"; then
     ui_print "*********************************************************"
     ui_print "! Unable to apply SELinux patches!"
-    abort    "*********************************************************"
+    abort "*********************************************************"
   fi
 fi
 
 ui_print "- Extracting module files"
-extract "$ZIPFILE" 'module.prop'               "$MODPATH"
-cp      "$MODPATH/module.prop"                 "$MODPATH/module.prop.orig"
-extract "$ZIPFILE" 'post-fs-data.sh'           "$MODPATH"
-extract "$ZIPFILE" 'late-load.sh'              "$MODPATH"
-mv      "$TMPDIR/sepolicy.rule"                "$MODPATH"
-extract "$ZIPFILE" 'emulated-soft-reboot.sh'   "$MODPATH"
-extract "$ZIPFILE" "machikado.$ARCH"           "$MODPATH"
-mv      "$MODPATH/machikado.$ARCH"             "$MODPATH/machikado"
-extract "$ZIPFILE" 'mazoku'                    "$MODPATH"
+extract "$ZIPFILE" 'module.prop' "$MODPATH"
+cp "$MODPATH/module.prop" "$MODPATH/module.prop.orig"
+extract "$ZIPFILE" 'post-fs-data.sh' "$MODPATH"
+extract "$ZIPFILE" 'late-load.sh' "$MODPATH"
+mv "$TMPDIR/sepolicy.rule" "$MODPATH"
+extract "$ZIPFILE" 'emulated-soft-reboot.sh' "$MODPATH"
+extract "$ZIPFILE" "machikado.$ARCH" "$MODPATH"
+mv "$MODPATH/machikado.$ARCH" "$MODPATH/machikado"
+extract "$ZIPFILE" 'mazoku' "$MODPATH"
 
 mkdir "$MODPATH/bin"
 mkdir "$MODPATH/lib"
