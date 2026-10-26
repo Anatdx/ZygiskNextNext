@@ -264,7 +264,9 @@ mod tests {
 
     #[test]
     fn channel_names_match_the_loader_format() {
+        // codeql[rust/hard-coded-cryptographic-value]
         assert_eq!(channel_name(0x00ab_cdef, 7), "znn.00abcdef.7");
+        // codeql[rust/hard-coded-cryptographic-value]
         assert_eq!(direct_channel_name(0x00ab_cdef, 7), "znn.c.00abcdef.7");
     }
 }
