@@ -23,7 +23,7 @@ pub const INFO: c_int = 4; // info
 pub const WARN: c_int = 5; // warn
 pub const ERROR: c_int = 6; // error
 
-const TAG: &std::ffi::CStr = c"znnd";
+const TAG: &std::ffi::CStr = c"znndaemon";
 const FORMAT: &std::ffi::CStr = c"%s";
 
 // SAFETY: export the __android_log_print
