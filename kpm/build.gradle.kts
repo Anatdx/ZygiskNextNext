@@ -191,9 +191,7 @@ listOf("debug", "release").forEach { variant ->
                 return@doLast
             }
             val toolchain = resolveToolchain()
-            if (toolchain == null) {
-                throw GradleException("cannot build the KernelPatch backend: ${toolchainHint()}")
-            }
+                ?: throw GradleException("cannot build the KernelPatch backend: ${toolchainHint()}")
             val artifact = buildKpm(toolchain, outputDirectory.get().asFile)
             logger.lifecycle(
                 "kpm ($variant): ${artifact.absolutePath} " +
