@@ -21,20 +21,23 @@ import { computed, ref, type ComputedRef } from "vue";
 
 import { en, type Dictionary } from "./en";
 import { zhCN } from "./zh-CN";
+import { lzh } from "./lzh";
 
-export type Locale = "zh-CN" | "en";
+export type Locale = "lzh" | "zh-CN" | "en";
 
 export const LOCALE_STORAGE_KEY = "znn_locale";
 
-export const LOCALES: Locale[] = ["zh-CN", "en"];
+export const LOCALES: Locale[] = ["lzh", "zh-CN", "en"];
 
 const dictionaries: Record<Locale, Dictionary> = {
+  "lzh": lzh,
   "zh-CN": zhCN,
   en,
 };
 
 export const LOCALE_LABELS: Record<Locale, string> = {
-  "zh-CN": "简体中文",
+  "lzh": "文言（華夏）",
+  "zh-CN": "中文（简体）",
   en: "English",
 };
 
@@ -45,7 +48,7 @@ export const locale: ComputedRef<Locale> = computed(() => currentRef.value);
 function detectLocale(): Locale {
   try {
     const saved = localStorage.getItem(LOCALE_STORAGE_KEY);
-    if (saved === "zh-CN" || saved === "en") return saved;
+    if (saved === "lzh" || saved === "zh-CN" || saved === "en") return saved;
   } catch {}
   const lang = (navigator.language || "en").toLowerCase();
   return lang.startsWith("zh") ? "zh-CN" : "en";
